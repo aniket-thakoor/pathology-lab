@@ -8,6 +8,7 @@ import TestResultsEntry from './components/pages/TestResultsEntry';
 import TestMaster from './components/pages/TestMaster';
 import SummaryReport from './components/pages/SummaryReport';
 import LabDetails from './components/pages/LabDetails';
+import RecentPatients from './components/pages/RecentPatients'; // make sure it matches your folder structure
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/patients" element={<RecentPatients />} />
           <Route path="/patient" element={<PatientEntry />} />
           <Route path="/results" element={<TestResultsEntry />} />
           <Route path="/test-setup" element={<TestMaster />} />

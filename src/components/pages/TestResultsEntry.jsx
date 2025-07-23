@@ -3,18 +3,18 @@ import {
   Box, Heading, Text, VStack, Button, Input,
   Modal, ModalOverlay, ModalContent, ModalHeader,
   ModalBody, ModalFooter, Checkbox, CheckboxGroup,
-  Divider
+  Divider, Flex, useToast
 } from '@chakra-ui/react';
-
 import { useNavigate } from 'react-router-dom';
 
 const TestResultsEntry = () => {
   const navigate = useNavigate();
+  const toast = useToast();
   const [patient, setPatient] = useState(() => JSON.parse(localStorage.getItem('currentPatient') || '{}'));
   const [groups, setGroups] = useState(() => JSON.parse(localStorage.getItem('testGroups') || '[]'));
   const [results, setResults] = useState(() => JSON.parse(localStorage.getItem('testResults') || '{}'));
-  const [showTestModal, setShowTestModal] = useState(false);
   const [selectedTests, setSelectedTests] = useState(patient.selectedTests || []);
+  const [showTestModal, setShowTestModal] = useState(false);
 
   const selectedGroups = groups.filter(group => selectedTests.includes(group.id));
 
@@ -37,8 +37,31 @@ const TestResultsEntry = () => {
     localStorage.setItem('testResults', JSON.stringify(updated));
   };
 
-  const handleSaveAndContinue = () => {
+  const updatePatientRecord = (updatedFields) => {
+    const updatedPatient = {
+      ...patient,
+      ...updatedFields,
+      testResults: results,
+      updatedAt: new Date().toISOString()
+    };
+
+    const allPatients = JSON.parse(localStorage.getItem('patients') || '[]');
+    const filtered = allPatients.filter(p => p.id !== updatedPatient.id);
+    const newList = [...filtered, updatedPatient];
+
+    localStorage.setItem('patients', JSON.stringify(newList));
+    localStorage.setItem('currentPatient', JSON.stringify(updatedPatient));
     localStorage.setItem('testResults', JSON.stringify(results));
+  };
+
+  const handleSaveAndExit = () => {
+    updatePatientRecord({ selectedTests, status: 'pending' });
+    toast({ title: 'Progress saved', status: 'success' });
+    navigate('/');
+  };
+
+  const handleSaveAndContinue = () => {
+    updatePatientRecord({ selectedTests, status: 'complete' });
     navigate('/summary');
   };
 
@@ -136,12 +159,12 @@ const TestResultsEntry = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      {/* ✅ Save Button */}
-      <Box textAlign="right" mt="6">
-        <Button colorScheme="blue" onClick={handleSaveAndContinue}>
-          ✅ Save & Continue
-        </Button>
-      </Box>
+
+      {/* Save Buttons */}
+      <Flex justify="space-between" mt="6">
+        <Button variant="outline" onClick={handleSaveAndExit}>💾 Save & Close</Button>
+        <Button colorScheme="blue" onClick={handleSaveAndContinue}>✅ Save & Continue</Button>
+      </Flex>
     </Box>
   );
 };

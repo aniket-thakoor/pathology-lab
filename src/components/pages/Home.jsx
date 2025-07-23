@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Box, Heading, Text, Grid, GridItem, Button, VStack, Flex
+  Box, Heading, Text, Grid, GridItem, Button, Flex
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,11 +8,13 @@ const Home = () => {
   const navigate = useNavigate();
 
   const labDetails = JSON.parse(localStorage.getItem('labDetails') || '{}');
+  const patients = JSON.parse(localStorage.getItem('patients') || '[]');
 
   const quickStats = {
     patientsToday: 12,
-    pendingResults: 4,
-    totalTests: 38
+    pendingResults: patients.filter(p => p.status === 'pending').length,
+    totalTests: 38,
+    totalPatients: patients.length
   };
 
   return (
@@ -41,13 +43,18 @@ const Home = () => {
           </Button>
         </GridItem>
         <GridItem>
-          <Button size="lg" colorScheme="orange" w="100%" onClick={() => navigate('test-setup')}>
+          <Button size="lg" colorScheme="orange" w="100%" onClick={() => navigate('/test-setup')}>
             ⚙️ Manage Test Setup
           </Button>
         </GridItem>
         <GridItem>
-          <Button size="lg" colorScheme="teal" w="100%" onClick={() => navigate('lab-details')}>
+          <Button size="lg" colorScheme="teal" w="100%" onClick={() => navigate('/lab-details')}>
             📝 Edit Lab Info
+          </Button>
+        </GridItem>
+        <GridItem>
+          <Button size="lg" colorScheme="gray" w="100%" onClick={() => navigate('/patients')}>
+            🕓 Resume Past Entries
           </Button>
         </GridItem>
       </Grid>
@@ -59,13 +66,17 @@ const Home = () => {
           <Text fontSize="xl" fontWeight="bold">{quickStats.patientsToday}</Text>
           <Text>Patients Registered Today</Text>
         </Box>
-        <Box p="4" bg="green.50" borderRadius="md" flex="1">
+        <Box p="4" bg="orange.50" borderRadius="md" flex="1">
           <Text fontSize="xl" fontWeight="bold">{quickStats.pendingResults}</Text>
-          <Text>Pending Test Results</Text>
+          <Text>Pending Test Entries</Text>
         </Box>
         <Box p="4" bg="purple.50" borderRadius="md" flex="1">
           <Text fontSize="xl" fontWeight="bold">{quickStats.totalTests}</Text>
           <Text>Total Tests Conducted</Text>
+        </Box>
+        <Box p="4" bg="gray.50" borderRadius="md" flex="1">
+          <Text fontSize="xl" fontWeight="bold">{quickStats.totalPatients}</Text>
+          <Text>Total Patients Recorded</Text>
         </Box>
       </Flex>
 
