@@ -3,6 +3,7 @@ import {
   Box, Heading, Input, Textarea, Button,
   FormControl, FormLabel, VStack, Text, Image
 } from '@chakra-ui/react';
+import { getLabDetails, putLabDetails } from '@/services/dbService';
 
 const LabDetails = () => {
   const [details, setDetails] = useState({
@@ -12,20 +13,24 @@ const LabDetails = () => {
     phone: '',
     email: '',
     specialistName: '',
-    qualification: '',
+    specialistQualification: '',
+    doctorName: '',
+    doctorQualification: '',
     regNo: '',
+    estd: '',
     timings: '',
     signature: ''
   });
 
-  // Load existing details if present
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('labDetails') || '{}');
-    if (stored && Object.keys(stored).length > 0) setDetails(stored);
+    getLabDetails().then((stored) => {
+      if (stored) setDetails(stored);
+    });
   }, []);
 
   const handleChange = (e) => {
-    setDetails({ ...details, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setDetails(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSignatureUpload = (e) => {
@@ -39,58 +44,31 @@ const LabDetails = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleSave = () => {
-    localStorage.setItem('labDetails', JSON.stringify(details));
-    alert('✅ Lab details saved successfully!');
+  const handleSave = async () => {
+    await putLabDetails(details);
+    alert('✅ Lab details saved!');
   };
 
   return (
     <Box p="6" maxW="800px" mx="auto">
-      <Heading mb="6">🏥 Enter Pathology Lab Details</Heading>
-      <VStack spacing="4" align="stretch">
-        <FormControl isRequired>
-          <FormLabel>Lab Name</FormLabel>
-          <Input name="labName" value={details.labName} onChange={handleChange} />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Subheading</FormLabel>
-          <Input name="subHeading" value={details.subHeading} onChange={handleChange} />
-        </FormControl>
+      <Heading size="lg" mb="6">🏥 Enter Lab Details</Heading>
+      <VStack spacing="5" align="stretch">
+        {[
+          ['Lab Name', 'labName'], ['Subheading', 'subHeading'],
+          ['Phone', 'phone'], ['Email', 'email'],
+          ['Specialist Name', 'specialistName'], ['Specialist Qualification', 'specialistQualification'],
+          ['Doctor Name', 'doctorName'], ['Doctor Qualification', 'doctorQualification'],
+          ['Year of Establishment.', 'estd'], ['Registration No.', 'regNo'], ['Consulting Timings', 'timings']
+        ].map(([label, name]) => (
+          <FormControl key={name} isRequired>
+            <FormLabel>{label}</FormLabel>
+            <Input name={name} value={details[name]} onChange={handleChange} />
+          </FormControl>
+        ))}
 
         <FormControl>
           <FormLabel>Address</FormLabel>
           <Textarea name="address" value={details.address} onChange={handleChange} />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Phone</FormLabel>
-          <Input name="phone" value={details.phone} onChange={handleChange} />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Email</FormLabel>
-          <Input name="email" value={details.email} onChange={handleChange} />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Specialist Name</FormLabel>
-          <Input name="specialistName" value={details.specialistName} onChange={handleChange} />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Qualification</FormLabel>
-          <Input name="qualification" value={details.qualification} onChange={handleChange} />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Registration No.</FormLabel>
-          <Input name="regNo" value={details.regNo} onChange={handleChange} />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Consulting Timings</FormLabel>
-          <Input name="timings" value={details.timings} onChange={handleChange} />
         </FormControl>
 
         <FormControl>

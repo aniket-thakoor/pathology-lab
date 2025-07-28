@@ -1,52 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box, Heading, Input, VStack, Text, Button, List, ListItem,
   Divider, Badge, Flex
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import { usePatientStorage } from '@/hooks/usePatientStorage';
 
 const RecentPatients = () => {
   const navigate = useNavigate();
-  const [patients, setPatients] = useState([]);
   const [search, setSearch] = useState('');
-  const [filtered, setFiltered] = useState([]);
-
-  useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('patients') || '[]');
-    const sorted = stored.sort((a, b) =>
-      new Date(b.updatedAt || b.sampleDate || b.createdAt) -
-      new Date(a.updatedAt || a.sampleDate || a.createdAt)
-    );
-    setPatients(sorted);
-    setFiltered(sorted);
-  }, []);
-
-  useEffect(() => {
-    const term = search.toLowerCase();
-    const matches = patients.filter(p =>
-      p.name.toLowerCase().includes(term) ||
-      p.mobile.includes(term) ||
-      (p.sampleDate && p.sampleDate.includes(term))
-    );
-    setFiltered(matches);
-  }, [search, patients]);
+  const {
+    patients,
+    loading,
+    error,
+    refresh,
+    removePatient,
+    modifyPatient
+  } = usePatientStorage();
 
   const resumeTestEntry = (patient) => {
-    localStorage.setItem('currentPatient', JSON.stringify(patient));
-    localStorage.setItem('testResults', JSON.stringify(patient.testResults || {}));
+    sessionStorage.setItem('editPatientId', patient.id);
     navigate('/results');
   };
-
+  
   const editPatientProfile = (patient) => {
-    localStorage.setItem('currentPatient', JSON.stringify(patient));
+    sessionStorage.setItem('editPatientId', patient.id);
     navigate('/patient');
   };
-
+  
   const viewSummaryReport = (patient) => {
-    localStorage.setItem('currentPatient', JSON.stringify(patient));
-    localStorage.setItem('testResults', JSON.stringify(patient.testResults || {}));
+    sessionStorage.setItem('editPatientId', patient.id);
     navigate('/summary');
-  };
+  };  
+
+  const filtered = patients.filter(p => {
+    const term = search.toLowerCase();
+    return (
+      p.name?.toLowerCase().includes(term) ||
+      p.mobile?.includes(term) ||
+      (p.sampleDate && p.sampleDate.includes(term))
+    );
+  });
 
   return (
     <Box p="6" maxW="800px" mx="auto">
@@ -59,11 +53,15 @@ const RecentPatients = () => {
         mb="4"
       />
 
-      <List spacing="3">
-        {filtered.length === 0 ? (
-          <Text>No matching patients found.</Text>
-        ) : (
-          filtered.map(p => (
+      {loading ? (
+        <Text>Loading patients...</Text>
+      ) : error ? (
+        <Text color="red.500">Error loading patients.</Text>
+      ) : filtered.length === 0 ? (
+        <Text>No matching patients found.</Text>
+      ) : (
+        <List spacing="3">
+          {filtered.map(p => (
             <ListItem key={p.id}>
               <Box p="4" borderWidth="1px" borderRadius="md" bg="gray.50">
                 <Flex justify="space-between" align="center" mb="2">
@@ -91,9 +89,9 @@ const RecentPatients = () => {
                 </Flex>
               </Box>
             </ListItem>
-          ))
-        )}
-      </List>
+          ))}
+        </List>
+      )}
     </Box>
   );
 };

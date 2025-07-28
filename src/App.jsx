@@ -8,7 +8,8 @@ import TestResultsEntry from './components/pages/TestResultsEntry';
 import TestMaster from './components/pages/TestMaster';
 import SummaryReport from './components/pages/SummaryReport';
 import LabDetails from './components/pages/LabDetails';
-import RecentPatients from './components/pages/RecentPatients'; // make sure it matches your folder structure
+import RecentPatients from './components/pages/RecentPatients';
+import SelectTestGroups from './components/pages/SelectTestGroups';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/patients" element={<RecentPatients />} />
           <Route path="/patient" element={<PatientEntry />} />
+          <Route path="/select-tests" element={<SelectTestGroups />} />
           <Route path="/results" element={<TestResultsEntry />} />
           <Route path="/test-setup" element={<TestMaster />} />
           <Route path="/summary" element={<SummaryReport />} />

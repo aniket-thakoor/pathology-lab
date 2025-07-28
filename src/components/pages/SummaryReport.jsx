@@ -1,21 +1,44 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Box, Heading, Text, VStack, Button, Flex,
   Switch, Divider
 } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
+import { ArrowBackIcon } from '@chakra-ui/icons';
+import {
+  getPatientById, getTestResults,
+  getTestGroups, getLabDetails
+} from '@/services/dbService';
 
 const SummaryReport = () => {
+  const navigate = useNavigate();
   const contentRef = useRef(null);
   const handlePrint = useReactToPrint({ contentRef });
 
-  const patient = JSON.parse(localStorage.getItem('currentPatient') || '{}');
-  const results = JSON.parse(localStorage.getItem('testResults') || '{}');
-  const groups = JSON.parse(localStorage.getItem('testGroups') || []);
-  const labDetails = JSON.parse(localStorage.getItem('labDetails') || '{}');
-
+  const [patient, setPatient] = useState({});
+  const [results, setResults] = useState({});
+  const [groups, setGroups] = useState([]);
+  const [labDetails, setLabDetails] = useState({});
   const [showRanges, setShowRanges] = useState(true);
   const [showNotes, setShowNotes] = useState(true);
+  const preloadId = sessionStorage.getItem('editPatientId');
+
+  useEffect(() => {
+    if (!preloadId) return;
+
+    Promise.all([
+      getLabDetails(),
+      getPatientById(preloadId),
+      getTestResults(preloadId),
+      getTestGroups()
+    ]).then(([lab, pat, res, grp]) => {
+      setLabDetails(lab || {});
+      setPatient(pat || {});
+      setResults(res || {});
+      setGroups(grp || []);
+    });
+  }, [preloadId]);
 
   const selectedGroups = groups.filter(g => patient.selectedTests?.includes(g.id));
   const getRange = (ranges, gender) => ranges[gender] || ranges["Common"];
@@ -26,7 +49,18 @@ const SummaryReport = () => {
 
   return (
     <Box p="6" maxW="900px" mx="auto">
-      <Heading mb="4">📄 Summary Report</Heading>
+      <Flex align="center" justify="space-between" mb="4">
+        <Button
+          leftIcon={<ArrowBackIcon />}
+          onClick={() => navigate('/')}
+          variant="ghost"
+          size="sm"
+        >
+          Back to Home
+        </Button>
+        <Heading mb="4">📄 Summary Report</Heading>
+        <Box w="90px" />
+      </Flex>
 
       {/* Controls */}
       <Flex justify="space-between" mb="6" align="center" wrap="wrap">
@@ -51,7 +85,6 @@ const SummaryReport = () => {
             <Text><strong>Mobile:</strong> {patient.mobile}</Text>
           </Box>
           <Box textAlign="right">
-            <Text><strong>Sample Type:</strong> {patient.sampleType}</Text>
             <Text><strong>Referred By:</strong> {patient.referredBy}</Text>
             <Text><strong>Sample Collected On:</strong> {patient.sampleDate}</Text>
           </Box>
@@ -78,7 +111,7 @@ const SummaryReport = () => {
                 </Box>
                 <Box textAlign="right">
                   <Text fontWeight="semibold" fontSize="sm">{labDetails.specialistName}</Text>
-                  <Text fontSize="sm">{labDetails.qualification}</Text>
+                  <Text fontSize="sm">{labDetails.specialistQualification}</Text>
                 </Box>
               </Flex>
               <Divider mt="2" />
@@ -89,7 +122,6 @@ const SummaryReport = () => {
                   <Text><strong>Mobile:</strong> {patient.mobile}</Text>
                 </Box>
                 <Box textAlign="right">
-                  <Text><strong>Sample Type:</strong> {patient.sampleType}</Text>
                   <Text><strong>Referred By:</strong> {patient.referredBy}</Text>
                   <Text><strong>Sample Collected On:</strong> {patient.sampleDate}</Text>
                 </Box>
@@ -161,7 +193,7 @@ const SummaryReport = () => {
       </Box>
 
       {/* Print & Share */}
-      <Flex justify="space-between" mt="6" wrap="wrap" gap="4">
+      <Box position="sticky" bottom="0" bg="white" p="4" borderTop="1px solid #e2e8f0" display="flex" justifyContent="space-around" flexWrap="wrap">
         <Button colorScheme="blue" onClick={handlePrint}>🖨️ Print / Save PDF</Button>
         <Button
           colorScheme="green"
@@ -172,7 +204,7 @@ const SummaryReport = () => {
         >
           📤 Send via WhatsApp
         </Button>
-      </Flex>
+      </Box>
     </Box>
   );
 };

@@ -3,16 +3,26 @@ import {
   Box, Heading, Text, Grid, GridItem, Button, Flex
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import { getLabDetails, getAllPatients } from '@/services/dbService';
 
 const Home = () => {
   const navigate = useNavigate();
+  const [labDetails, setLabDetails] = useState({});
+  const [patients, setPatients] = useState({});
 
-  const labDetails = JSON.parse(localStorage.getItem('labDetails') || '{}');
-  const patients = JSON.parse(localStorage.getItem('patients') || '[]');
+  useEffect(() => {
+      Promise.all([
+        getLabDetails(),
+        getAllPatients()
+      ]).then(([lab, pat]) => {
+        setLabDetails(lab || {});
+        setPatients(pat || {});
+      });
+    }, []);
 
   const quickStats = {
     patientsToday: 12,
-    pendingResults: patients.filter(p => p.status === 'pending').length,
+    pendingResults: patients.filter ? patients.filter(p => p.status === 'pending').length : 0,
     totalTests: 38,
     totalPatients: patients.length
   };
@@ -22,17 +32,25 @@ const Home = () => {
       {/* Header Branding */}
       <Box mb="6" textAlign="center">
         <Heading size="lg" color="blue.700">🔬 {labDetails.labName}</Heading>
-        <Text fontSize="md" color="gray.600">Serving precision and care since 1993</Text>
+        <Text fontSize="md" color="gray.600">Serving precision and care since {labDetails.estd}</Text>
       </Box>
 
       {/* Quick Navigation Buttons */}
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap="6" mb="10">
         <GridItem>
-          <Button size="lg" colorScheme="blue" w="100%" onClick={() => navigate('/patient')}>
+          <Button size="lg" colorScheme="blue" w="100%" onClick={() => {
+            sessionStorage.removeItem('editPatientId');
+            navigate('/patient')
+          }}>
             🧍 New Patient Entry
           </Button>
         </GridItem>
         <GridItem>
+          <Button size="lg" colorScheme="purple" w="100%" onClick={() => navigate('/patients')}>
+            🕓 Resume Past Entries
+          </Button>
+        </GridItem>
+        {/* <GridItem>
           <Button size="lg" colorScheme="green" w="100%" onClick={() => navigate('/results')}>
             🧪 Enter Test Results
           </Button>
@@ -41,7 +59,7 @@ const Home = () => {
           <Button size="lg" colorScheme="purple" w="100%" onClick={() => navigate('/summary')}>
             📄 View Summary Report
           </Button>
-        </GridItem>
+        </GridItem> */}
         <GridItem>
           <Button size="lg" colorScheme="orange" w="100%" onClick={() => navigate('/test-setup')}>
             ⚙️ Manage Test Setup
@@ -50,11 +68,6 @@ const Home = () => {
         <GridItem>
           <Button size="lg" colorScheme="teal" w="100%" onClick={() => navigate('/lab-details')}>
             📝 Edit Lab Info
-          </Button>
-        </GridItem>
-        <GridItem>
-          <Button size="lg" colorScheme="gray" w="100%" onClick={() => navigate('/patients')}>
-            🕓 Resume Past Entries
           </Button>
         </GridItem>
       </Grid>

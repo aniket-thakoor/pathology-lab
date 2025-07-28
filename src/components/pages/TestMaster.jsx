@@ -1,25 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Flex, Heading, VStack, Input, Textarea, Button,
-  Select, Divider, Text, List, ListItem, IconButton, useToast,
-  Stack
+  Select, Divider, Text, List, ListItem, IconButton, useToast, Stack
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
+
+import {
+  getTestGroups,
+  putTestGroups,
+  addSubgroup,
+  updateSubgroup,
+  deleteSubgroup,
+  addParameterToSubgroup,
+  updateParameterInSubgroup,
+  deleteParameterFromSubgroup
+} from '@/services/dbService';
 
 const TestMaster = () => {
   const toast = useToast();
 
   // Groups
-  const [groups, setGroups] = useState(() => JSON.parse(localStorage.getItem('testGroups')) || []);
+  const [groups, setGroups] = useState([]);
+  const [selectedGroupId, setSelectedGroupId] = useState('');
+  const [selectedSubGroupId, setSelectedSubGroupId] = useState('');
+
   const [groupName, setGroupName] = useState('');
   const [groupDesc, setGroupDesc] = useState('');
-  const [selectedGroupId, setSelectedGroupId] = useState('');
   const [editingGroupId, setEditingGroupId] = useState('');
 
   // Subgroups
   const [subGroupName, setSubGroupName] = useState('');
   const [editingSubGroupId, setEditingSubGroupId] = useState('');
-  const [selectedSubGroupId, setSelectedSubGroupId] = useState('');
 
   // Parameters
   const [paramName, setParamName] = useState('');
@@ -29,65 +40,63 @@ const TestMaster = () => {
   const [editingParamId, setEditingParamId] = useState('');
 
   useEffect(() => {
-    localStorage.setItem('testGroups', JSON.stringify(groups));
-  }, [groups]);
+    getTestGroups().then(setGroups);
+  }, []);
 
-  // 👉 Group Functions
-  const saveGroup = () => {
+  const selectedGroup = groups.find(g => g.id === selectedGroupId);
+  const selectedSubGroup = selectedGroup?.subGroups?.find(sg => sg.id === selectedSubGroupId);
+
+  const syncGroups = async () => {
+    const updated = await getTestGroups();
+    setGroups(updated);
+  };
+
+  // Group Logic
+  const saveGroup = async () => {
     if (!groupName.trim()) return;
-    if (editingGroupId) {
-      setGroups(prev =>
-        prev.map(g => g.id === editingGroupId
-          ? { ...g, name: groupName, desc: groupDesc }
-          : g
-        )
-      );
-      toast({ title: "Group updated!", status: "success" });
-    } else {
-      const newGroup = { id: Date.now().toString(), name: groupName, desc: groupDesc, subGroups: [] };
-      setGroups(prev => [...prev, newGroup]);
-      toast({ title: "Group created!", status: "success" });
-    }
+    const group = { id: editingGroupId || Date.now().toString(), name: groupName, desc: groupDesc, subGroups: [] };
+    const updated = editingGroupId
+      ? groups.map(g => g.id === editingGroupId ? group : g)
+      : [...groups, group];
+
+    await putTestGroups(updated);
+    setGroups(updated);
     setGroupName('');
     setGroupDesc('');
     setEditingGroupId('');
+    toast({ title: editingGroupId ? 'Group updated' : 'Group created', status: 'success' });
   };
 
-  const deleteGroup = (id) => {
-    if (window.confirm("Delete this test group permanently?")) {
-      setGroups(prev => prev.filter(g => g.id !== id));
-      setSelectedGroupId('');
-      toast({ title: "Group deleted.", status: "info" });
-    }
+  const editGroup = (g) => {
+    setGroupName(g.name);
+    setGroupDesc(g.desc);
+    setEditingGroupId(g.id);
+    setSelectedGroupId(g.id);
   };
 
-  const editGroup = (group) => {
-    setGroupName(group.name);
-    setGroupDesc(group.desc);
-    setEditingGroupId(group.id);
-    setSelectedGroupId(group.id);
+  const deleteGroup = async (id) => {
+    if (!window.confirm('Delete this test group?')) return;
+    const updated = groups.filter(g => g.id !== id);
+    await putTestGroups(updated);
+    setGroups(updated);
+    setSelectedGroupId('');
+    toast({ title: 'Group deleted', status: 'info' });
   };
 
-  // 👉 Subgroup Functions
-  const saveSubGroup = () => {
+  // Subgroup Logic
+  const saveSubGroup = async () => {
     if (!subGroupName || !selectedGroupId) return;
+    const subgroup = { id: editingSubGroupId || Date.now().toString(), name: subGroupName, parameters: [] };
 
-    setGroups(prev =>
-      prev.map(g => {
-        if (g.id === selectedGroupId) {
-          const updatedSubGroups = editingSubGroupId
-            ? g.subGroups.map(sg => sg.id === editingSubGroupId ? { ...sg, name: subGroupName } : sg)
-            : [...g.subGroups, { id: Date.now().toString(), name: subGroupName, parameters: [] }];
-
-          return { ...g, subGroups: updatedSubGroups };
-        }
-        return g;
-      })
-    );
-
-    toast({ title: editingSubGroupId ? "Subgroup updated!" : "Subgroup created!", status: "success" });
+    if (editingSubGroupId) {
+      await updateSubgroup(selectedGroupId, subgroup);
+    } else {
+      await addSubgroup(selectedGroupId, subgroup);
+    }
     setSubGroupName('');
     setEditingSubGroupId('');
+    await syncGroups();
+    toast({ title: editingSubGroupId ? 'Subgroup updated' : 'Subgroup created', status: 'success' });
   };
 
   const editSubGroup = (sub) => {
@@ -96,176 +105,144 @@ const TestMaster = () => {
     setSelectedSubGroupId(sub.id);
   };
 
-  const deleteSubGroup = (id) => {
-    setGroups(prev =>
-      prev.map(g => {
-        if (g.id === selectedGroupId) {
-          return { ...g, subGroups: g.subGroups.filter(sg => sg.id !== id) };
-        }
-        return g;
-      })
-    );
-    toast({ title: "Subgroup deleted.", status: "info" });
+  const handleDeleteSubGroup = async (id) => {
+    await deleteSubgroup(selectedGroupId, id);
     setSelectedSubGroupId('');
+    await syncGroups();
+    toast({ title: 'Subgroup deleted', status: 'info' });
   };
 
-  // 👉 Parameter Functions
-  const saveParameter = () => {
-    if (!paramName || !paramUnit || !selectedGroupId || !selectedSubGroupId || ranges.length === 0) {
-      toast({ title: "Please complete all fields.", status: "warning" });
+  // Parameter Logic
+  const saveParameter = async () => {
+    if (!paramName || !paramUnit || ranges.length === 0) {
+      toast({ title: 'Fill all required fields', status: 'warning' });
       return;
     }
 
     const cleanRanges = {};
     ranges.forEach(r => {
       if (r.type && r.min && r.max) {
-        cleanRanges[r.type] = { min: parseFloat(r.min), max: parseFloat(r.max), note: r.note };
+        cleanRanges[r.type] = {
+          min: parseFloat(r.min),
+          max: parseFloat(r.max),
+          note: r.note || ''
+        };
       }
     });
 
-    setGroups(prev =>
-      prev.map(g => {
-        if (g.id === selectedGroupId) {
-          const updatedSubGroups = g.subGroups.map(sg => {
-            if (sg.id === selectedSubGroupId) {
-              const newParam = {
-                id: editingParamId || Date.now().toString(),
-                name: paramName,
-                unit: paramUnit,
-                ranges: cleanRanges,
-                note: paramNote
-              };
-              const filtered = sg.parameters.filter(p => p.id !== editingParamId);
-              return { ...sg, parameters: editingParamId ? [...filtered, newParam] : [...sg.parameters, newParam] };
-            }
-            return sg;
-          });
-          return { ...g, subGroups: updatedSubGroups };
-        }
-        return g;
-      })
-    );
+    const param = {
+      id: editingParamId || Date.now().toString(),
+      name: paramName,
+      unit: paramUnit,
+      ranges: cleanRanges,
+      note: paramNote
+    };
 
-    toast({ title: editingParamId ? "Parameter updated!" : "Parameter added!", status: "success" });
+    if (editingParamId) {
+      await updateParameterInSubgroup(selectedGroupId, selectedSubGroupId, param);
+    } else {
+      await addParameterToSubgroup(selectedGroupId, selectedSubGroupId, param);
+    }
+
     setParamName('');
     setParamUnit('');
+    setParamNote('');
     setRanges([]);
     setEditingParamId('');
-    setParamNote('');
+    await syncGroups();
+    toast({ title: editingParamId ? 'Parameter updated' : 'Parameter saved', status: 'success' });
   };
 
-  const editParameter = (param) => {
-    setParamName(param.name);
-    setParamUnit(param.unit);
-    setEditingParamId(param.id);
-    setRanges(Object.entries(param.ranges).map(([type, r]) => ({
-      id: Date.now() + Math.random(), type, min: r.min, max: r.max, note: r.note
+  const editParameter = (p) => {
+    setParamName(p.name);
+    setParamUnit(p.unit);
+    setParamNote(p.note);
+    setEditingParamId(p.id);
+    setRanges(Object.entries(p.ranges).map(([type, range]) => ({
+      id: Date.now() + Math.random(),
+      type,
+      min: range.min,
+      max: range.max,
+      note: range.note || ''
     })));
-    setParamNote(param.note || '');
   };
 
-  const deleteParameter = (id) => {
-    setGroups(prev =>
-      prev.map(g => {
-        if (g.id === selectedGroupId) {
-          const updatedSubGroups = g.subGroups.map(sg => {
-            if (sg.id === selectedSubGroupId) {
-              return { ...sg, parameters: sg.parameters.filter(p => p.id !== id) };
-            }
-            return sg;
-          });
-          return { ...g, subGroups: updatedSubGroups };
-        }
-        return g;
-      })
-    );
-    toast({ title: "Parameter deleted.", status: "info" });
+  const handleDeleteParameter = async (id) => {
+    await deleteParameterFromSubgroup(selectedGroupId, selectedSubGroupId, id);
+    await syncGroups();
+    toast({ title: 'Parameter deleted', status: 'info' });
   };
 
-  // 🔁 Range Helpers
-  const addRangeRow = () => {
-    setRanges(prev => [...prev, { id: Date.now(), type: '', min: '', max: '', note: '' }]);
-  };
+  // Range Helpers
+  const addRangeRow = () => setRanges(r => [...r, { id: Date.now(), type: '', min: '', max: '', note: '' }]);
+  const updateRange = (id, field, val) => setRanges(r => r.map(row => row.id === id ? { ...row, [field]: val } : row));
+  const removeRange = (id) => setRanges(r => r.filter(row => row.id !== id));
 
-  const updateRange = (id, field, value) => {
-    setRanges(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r));
-  };
-
-  const removeRange = (id) => {
-    setRanges(prev => prev.filter(r => r.id !== id));
-  };
-
-  const selectedGroup = groups.find(g => g.id === selectedGroupId);
-  const selectedSubGroup = selectedGroup?.subGroups.find(sg => sg.id === selectedSubGroupId);
-
-  const handleExport = () => {
-    const data = JSON.parse(localStorage.getItem('testGroups') || '[]');
+  const handleExport = async () => {
+    const data = await getTestGroups();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = 'testGroups.json';
     link.click();
   };
-  
+
   const handleImport = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-  
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const imported = JSON.parse(event.target.result);
-        localStorage.setItem('testGroups', JSON.stringify(imported));
-        setGroups(imported); // Optional: update state directly
-        alert('✅ Test data imported successfully!');
-      } catch (err) {
-        alert('❌ Invalid JSON file.');
+        await putTestGroups(imported);
+        setGroups(imported);
+        toast({ title: 'Import successful', status: 'success' });
+      } catch {
+        toast({ title: 'Invalid JSON file', status: 'error' });
       }
     };
     reader.readAsText(file);
-  };  
+  };
 
   return (
     <Flex minH="100vh">
       {/* Sidebar */}
       <Box w="360px" p="5" bg="gray.100" borderRight="1px solid #ddd">
-        <Flex justify="space-between" gap="4" mb="6" wrap="wrap">
-            <Button colorScheme="blue" onClick={handleExport}>
-                📤 Export Tests
-            </Button>
-
-            <Input
-                type="file"
-                accept=".json"
-                onChange={handleImport}
-                display="none"
-                id="import-json"
-            />
-            <Button as="label" htmlFor="import-json" colorScheme="green">
-                📥 Import Tests
-            </Button>
+        <Flex justify="space-between" gap="4" mb="6">
+          <Button colorScheme="blue" onClick={handleExport}>📤 Export</Button>
+          <Input type="file" id="import-json" display="none" accept=".json" onChange={handleImport} />
+          <Button as="label" htmlFor="import-json" colorScheme="green">📥 Import</Button>
         </Flex>
+
         <Heading size="md" mb="4">🧪 Test Groups</Heading>
         <List spacing="3">
-          {groups.map(group => (
-            <ListItem key={group.id} p="2" borderRadius="md" bg={selectedGroupId === group.id ? "blue.100" : "white"}>
+          {groups.map(g => (
+            <ListItem key={g.id} p="2" bg={selectedGroupId === g.id ? 'blue.100' : 'white'} borderRadius="md">
               <Flex justify="space-between" align="center">
-                <Box cursor="pointer" onClick={() => setSelectedGroupId(group.id)}>
-                  <Text fontWeight="bold">{group.name}</Text>
-                  <Text fontSize="sm">{group.desc}</Text>
+                <Box onClick={() => setSelectedGroupId(g.id)} cursor="pointer">
+                  <Text fontWeight="bold">{g.name}</Text>
+                  <Text fontSize="sm">{g.desc}</Text>
                 </Box>
                 <Stack direction="row">
-                  <IconButton size="sm" icon={<EditIcon />} onClick={() => editGroup(group)} aria-label="Edit group" />
-                  <IconButton size="sm" icon={<DeleteIcon />} onClick={() => deleteGroup(group.id)} aria-label="Delete group" />
+                  <IconButton size="sm" icon={<EditIcon />} onClick={() => editGroup(g)} />
+                  <IconButton size="sm" icon={<DeleteIcon />} onClick={() => deleteGroup(g.id)} />
                 </Stack>
               </Flex>
             </ListItem>
           ))}
         </List>
-        <Divider mt="6" />
+
         <VStack spacing="3" mt="4">
-          <Input placeholder="Group Name" value={groupName} onChange={e => setGroupName(e.target.value)} />
-          <Textarea placeholder="Description" value={groupDesc} onChange={e => setGroupDesc(e.target.value)} />
+          <Input
+            placeholder="Group Name"
+            value={groupName}
+            onChange={e => setGroupName(e.target.value)}
+          />
+          <Textarea
+            placeholder="Description"
+            value={groupDesc}
+            onChange={e => setGroupDesc(e.target.value)}
+          />
           <Button onClick={saveGroup}>
             {editingGroupId ? "💾 Update Group" : "➕ Create Group"}
           </Button>
@@ -276,78 +253,80 @@ const TestMaster = () => {
       <Box flex="1" p="6">
         <Heading size="lg" mb="6">Create & Manage Subgroups & Parameters</Heading>
 
-        {/* Subgroup Form */}
+        {/* Subgroups */}
         {selectedGroup && (
-          <Box mb="8">
+          <>
             <Heading size="md" mb="3">📂 Subgroups in "{selectedGroup.name}"</Heading>
-            <List spacing="2">
+            <List spacing="2" mb="4">
               {selectedGroup.subGroups.map(sub => (
-                <ListItem key={sub.id} p="2" border="1px solid #ddd" borderRadius="md" bg={selectedSubGroupId === sub.id ? "green.50" : "white"}>
+                <ListItem key={sub.id} p="2" borderRadius="md" border="1px solid #ccc" bg={selectedSubGroupId === sub.id ? "green.50" : "white"}>
                   <Flex justify="space-between" align="center">
                     <Box cursor="pointer" onClick={() => setSelectedSubGroupId(sub.id)}>
                       <Text fontWeight="bold">{sub.name}</Text>
-                      <Text fontSize="sm" color="gray.600">{sub.parameters?.length || 0} parameters</Text>
+                      <Text fontSize="sm" color="gray.600">
+                        {sub.parameters?.length || 0} parameters
+                      </Text>
                     </Box>
                     <Stack direction="row">
                       <IconButton icon={<EditIcon />} size="sm" onClick={() => editSubGroup(sub)} />
-                      <IconButton icon={<DeleteIcon />} size="sm" onClick={() => deleteSubGroup(sub.id)} />
+                      <IconButton icon={<DeleteIcon />} size="sm" onClick={() => handleDeleteSubGroup(sub.id)} />
                     </Stack>
                   </Flex>
                 </ListItem>
               ))}
             </List>
 
-            {/* Create/Edit Subgroup */}
-            <VStack spacing="3" mt="4" align="stretch">
-              <Input placeholder="Subgroup Name" value={subGroupName} onChange={e => setSubGroupName(e.target.value)} />
+            {/* Subgroup Form */}
+            <VStack spacing="3" align="stretch">
+              <Input
+                placeholder="Subgroup Name"
+                value={subGroupName}
+                onChange={e => setSubGroupName(e.target.value)}
+              />
               <Flex gap="3">
                 <Button colorScheme="blue" onClick={saveSubGroup}>
                   {editingSubGroupId ? "💾 Update Subgroup" : "➕ Create Subgroup"}
                 </Button>
                 {editingSubGroupId && (
-                  <Button variant="outline" onClick={() => { setSubGroupName(''); setEditingSubGroupId(''); }}>Cancel</Button>
+                  <Button variant="outline" onClick={() => {
+                    setSubGroupName('');
+                    setEditingSubGroupId('');
+                  }}>Cancel</Button>
                 )}
               </Flex>
             </VStack>
-          </Box>
+          </>
         )}
 
-        {/* Parameter Form */}
+        {/* Parameters */}
         {selectedSubGroup && (
           <>
-            <Heading size="md" mb="3">🧾 Parameters in "{selectedSubGroup.name}"</Heading>
+            <Heading size="md" mt="8" mb="3">🧾 Parameters in "{selectedSubGroup.name}"</Heading>
             <List spacing="4" mb="6">
-              {selectedSubGroup.parameters.map(param => (
-                <Box key={param.id} p="4" border="1px solid #ccc" borderRadius="md">
-                  <Text fontWeight="bold">{param.name} ({param.unit})</Text>
+              {selectedSubGroup.parameters.map(p => (
+                <Box key={p.id} p="4" border="1px solid #ccc" borderRadius="md">
+                  <Text fontWeight="bold">{p.name} ({p.unit})</Text>
                   <Text fontSize="sm" color="gray.600" mt="1">
-                    {Object.entries(param.ranges).map(([type, r]) =>
+                    {Object.entries(p.ranges).map(([type, r]) =>
                       `${type}: ${r.min}–${r.max}`
                     ).join(' | ')}
                   </Text>
-                  {param.note && (
-                    <Text fontSize="sm" color="gray.600" mt="1">
-                        📝 {param.note}
-                    </Text>
+                  {p.note && (
+                    <Text fontSize="sm" color="gray.600" mt="1">📝 {p.note}</Text>
                   )}
                   <Flex gap="3" mt="2">
-                    <Button size="sm" onClick={() => editParameter(param)}>✏️ Edit</Button>
-                    <Button size="sm" colorScheme="red" onClick={() => deleteParameter(param.id)}>❌ Delete</Button>
+                    <Button size="sm" onClick={() => editParameter(p)}>✏️ Edit</Button>
+                    <Button size="sm" colorScheme="red" onClick={() => handleDeleteParameter(p.id)}>❌ Delete</Button>
                   </Flex>
                 </Box>
               ))}
             </List>
 
-            {/* Add/Edit Parameter Form */}
+            {/* Parameter Form */}
             <VStack spacing="3" align="stretch">
               <Input placeholder="Parameter Name" value={paramName} onChange={e => setParamName(e.target.value)} />
               <Input placeholder="Unit (e.g. mg/dL)" value={paramUnit} onChange={e => setParamUnit(e.target.value)} />
-              <Textarea
-                placeholder="Interpretation Note (optional)"
-                value={paramNote}
-                onChange={e => setParamNote(e.target.value)}
-                size="sm"
-              />
+              <Textarea placeholder="Interpretation Note (optional)" value={paramNote} onChange={e => setParamNote(e.target.value)} size="sm" />
 
               <Heading size="sm">Normal Ranges</Heading>
               {ranges.map(r => (
@@ -362,16 +341,18 @@ const TestMaster = () => {
                   <Input type="number" placeholder="Min" value={r.min} onChange={e => updateRange(r.id, 'min', e.target.value)} w="120px" />
                   <Input type="number" placeholder="Max" value={r.max} onChange={e => updateRange(r.id, 'max', e.target.value)} w="120px" />
                   <Textarea
-                    placeholder="Interpretation Note (optional)"
+                    placeholder="Note (optional)"
                     value={r.note}
                     onChange={e => updateRange(r.id, 'note', e.target.value)}
                     size="sm"
+                    w="240px"
                   />
                   <Button size="sm" colorScheme="red" onClick={() => removeRange(r.id)}>❌</Button>
                 </Flex>
               ))}
               <Button onClick={addRangeRow}>➕ Add Range</Button>
-              <Flex gap="3">
+
+              <Flex gap="3" mt="3">
                 <Button colorScheme="green" onClick={saveParameter}>
                   {editingParamId ? "💾 Update Parameter" : "✅ Save Parameter"}
                 </Button>
