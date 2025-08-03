@@ -11,7 +11,10 @@ import {
   getPatientById,
   getTestGroups,
   updatePatientStatus,
-  putTestResults
+  putTestResults,
+  getSelectedTests,
+  putSelectedTests,
+  getTestResults
 } from '@/services/dbService';
 
 const TestResultsEntry = () => {
@@ -27,15 +30,19 @@ const TestResultsEntry = () => {
   const preloadId = sessionStorage.getItem('editPatientId');
 
   useEffect(() => {
-    const loadData = async () => {
-      const p = await getPatientById(preloadId);
-      const tg = await getTestGroups();
-      setPatient(p);
-      setGroups(tg);
-      setSelectedTests(p.selectedTests || []);
-      setResults(p.testResults || {});
-    };
-    if (preloadId) loadData();
+    if (!preloadId) return;
+
+    Promise.all([
+      getPatientById(preloadId),
+      getSelectedTests(preloadId),
+      getTestResults(preloadId),
+      getTestGroups()
+    ]).then(([pat, test, res, grp]) => {
+      setPatient(pat || {});
+      setSelectedTests(test || {});
+      setResults(res || {});
+      setGroups(grp || []);
+    });
   }, [preloadId]);
 
   const selectedGroups = groups.filter(g => selectedTests.includes(g.id));
@@ -72,8 +79,9 @@ const TestResultsEntry = () => {
     navigate('/summary');
   };
 
-  const handleSaveTests = () => {
-    setPatient(prev => ({ ...prev, selectedTests }));
+  const handleSaveTests = async () => {
+    await putSelectedTests(preloadId, selectedTests)
+    //setPatient(prev => ({ ...prev, selectedTests }));
     setShowTestModal(false);
   };
 

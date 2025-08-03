@@ -6,6 +6,9 @@ export const getDB = async () => {
       if (!db.objectStoreNames.contains('patients')) {
         db.createObjectStore('patients', { keyPath: 'id' });
       }
+      if (!db.objectStoreNames.contains('selectedTests')) {
+        db.createObjectStore('selectedTests', { keyPath: 'patientId' });
+      }
       if (!db.objectStoreNames.contains('testResults')) {
         db.createObjectStore('testResults', { keyPath: 'patientId' });
       }
@@ -63,6 +66,27 @@ export const getPatientById = async (id) => {
   return await db.get('patients', id);
 };
 
+// Save or Replace selected tests
+export const putSelectedTests = async (patientId, tests) => {
+  const db = await getDB();
+  await db.put('selectedTests', { patientId, tests });
+};
+
+// Update Selected tests by Patient ID
+export const updateSelectedTests = async (patientId, updates) => {
+  const db = await getDB();
+  const existing = await db.get('selectedTests', patientId);
+  const merged = { ...existing?.tests || {}, ...updates };
+  await db.put('selectedTests', { patientId, tests: merged });
+};
+
+// Get Selected tests by Patient ID
+export const getSelectedTests = async (patientId) => {
+  const db = await getDB();
+  const record = await db.get('selectedTests', patientId);
+  return record?.tests || {};
+};
+
 // Save or Replace Test Results
 export const putTestResults = async (patientId, results) => {
   const db = await getDB();
@@ -113,7 +137,7 @@ export const updateSubgroup = async (groupId, subgroup) => {
       ? {
           ...g,
           subGroups: g.subGroups.map(sg =>
-            sg.id === subgroup.id ? subgroup : sg
+            sg.id === subgroup.id ? {...sg, ...subgroup} : sg
           )
         }
       : g

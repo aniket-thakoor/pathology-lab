@@ -19,7 +19,7 @@ const PatientEntry = () => {
   const [tests, setTests] = useState([]);
   const [form, setForm] = useState({
     name: '',
-    gender: '',
+    gender: 'Male',
     isNewBorn: false,
     age: '',
     mobile: '',

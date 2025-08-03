@@ -4,7 +4,7 @@ import {
   Button, useToast
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { getTestGroups, updatePatient } from '@/services/dbService';
+import { getTestGroups, putSelectedTests } from '@/services/dbService';
 
 const SelectTestGroups = () => {
   const toast = useToast();
@@ -36,10 +36,12 @@ const SelectTestGroups = () => {
       return;
     }
 
-    await updatePatient(patientId, {
-      selectedTests: selected,
-      updatedAt: new Date().toISOString()
-    });
+    // await updatePatient(patientId, {
+    //   selectedTests: selected,
+    //   updatedAt: new Date().toISOString()
+    // });
+
+    await putSelectedTests(patientId, selected);
 
     toast({ title: 'Test groups updated.', status: 'success' });
     navigate('/results');

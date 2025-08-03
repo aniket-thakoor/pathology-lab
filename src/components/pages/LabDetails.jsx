@@ -49,6 +49,37 @@ const LabDetails = () => {
     alert('✅ Lab details saved!');
   };
 
+  const handleExport = () => {
+    const dataStr = JSON.stringify(details, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+  
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'lab-details.json';
+    a.click();
+  
+    URL.revokeObjectURL(url);
+  };
+  
+  const handleImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+  
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result);
+        setDetails(prev => ({ ...prev, ...parsed }));
+        alert('✅ Lab details imported!');
+      } catch (err) {
+        alert('❌ Failed to import. Please check JSON format.');
+      }
+    };
+    reader.readAsText(file);
+  };
+  
+
   return (
     <Box p="6" maxW="800px" mx="auto">
       <Heading size="lg" mb="6">🏥 Enter Lab Details</Heading>
@@ -83,6 +114,11 @@ const LabDetails = () => {
         </FormControl>
 
         <Button colorScheme="blue" onClick={handleSave}>💾 Save Lab Details</Button>
+        <Button colorScheme="green" onClick={handleExport}>📤 Export to JSON</Button>
+      <FormControl>
+        <FormLabel>📥 Import from JSON</FormLabel>
+        <Input type="file" accept=".json" onChange={handleImport} />
+      </FormControl>
       </VStack>
     </Box>
   );
