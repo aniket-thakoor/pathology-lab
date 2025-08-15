@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Flex, Heading, VStack, Input, Textarea, Button, Select,
-  Divider, Text, List, ListItem, IconButton, useToast, Stack
+  Divider, Text, List, ListItem, IconButton, useToast, Stack, Checkbox
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import {
@@ -17,6 +17,7 @@ const TestMaster = () => {
   const [selectedSubGroupId, setSelectedSubGroupId] = useState('');
   const [groupName, setGroupName] = useState('');
   const [groupDesc, setGroupDesc] = useState('');
+  const [groupHasRanges, setGroupHasRanges] = useState(true);
   const [editingGroupId, setEditingGroupId] = useState('');
   const [subGroupName, setSubGroupName] = useState('');
   const [editingSubGroupId, setEditingSubGroupId] = useState('');
@@ -41,6 +42,7 @@ const TestMaster = () => {
     setSelectedSubGroupId('');
     setGroupName('');
     setGroupDesc('');
+    setGroupHasRanges(true);
     setSubGroupName('');
     setParamName('');
     setParamUnit('');
@@ -56,7 +58,8 @@ const TestMaster = () => {
     const group = {
       id: editingGroupId || Date.now().toString(),
       name: groupName,
-      desc: groupDesc
+      desc: groupDesc,
+      hasRanges: groupHasRanges
     };
     !editingGroupId && (group.subGroups = []);
     const updated = editingGroupId
@@ -66,6 +69,7 @@ const TestMaster = () => {
     setGroups(updated);
     setGroupName('');
     setGroupDesc('');
+    setGroupHasRanges(true);
     setEditingGroupId('');
     setSelectedGroupId(group.id);
     toast({ title: editingGroupId ? 'Group updated' : 'Group created', status: 'success' });
@@ -91,7 +95,7 @@ const TestMaster = () => {
   };
 
   const saveParameter = async () => {
-    if (!paramName || !paramUnit || ranges.length === 0) {
+    if (!paramName) {
       toast({ title: 'Fill all required fields', status: 'warning' });
       return;
     }
@@ -129,6 +133,7 @@ const TestMaster = () => {
   const editGroup = g => {
     setGroupName(g.name);
     setGroupDesc(g.desc);
+    setGroupHasRanges(g.hasRanges);
     setEditingGroupId(g.id);
     setSelectedGroupId(g.id);
   };
@@ -228,7 +233,6 @@ const TestMaster = () => {
               <Flex justify="space-between" align="center">
                 <Box onClick={() => setSelectedGroupId(g.id)} cursor="pointer">
                   <Text fontWeight="bold">{g.name}</Text>
-                  <Text fontSize="sm" color="gray.600">{g.desc}</Text>
                 </Box>
                 <Stack direction="row">
                   <IconButton size="sm" icon={<EditIcon />} onClick={() => editGroup(g)} />
@@ -242,6 +246,12 @@ const TestMaster = () => {
         <VStack spacing={3} mt={4}>
           <Input placeholder="Group Name" value={groupName} onChange={e => setGroupName(e.target.value)} />
           <Textarea placeholder="Description" value={groupDesc} onChange={e => setGroupDesc(e.target.value)} />
+          <Checkbox 
+            isChecked={groupHasRanges}
+            onChange={e => setGroupHasRanges(e.target.checked)}
+          >
+            Has Reference Range / Units?
+          </Checkbox>
           <Button onClick={saveGroup}>
             {editingGroupId ? '💾 Update Group' : '➕ Create Group'}
           </Button>
@@ -257,7 +267,8 @@ const TestMaster = () => {
             <Button size="sm" mb={2} onClick={() => setSelectedGroupId('')}>⬅️ Back to Groups</Button>
             <List spacing={3}>
               {selectedGroup.subGroups.map(sub => (
-                <ListItem key={sub.id} p={3} bg={selectedSubGroupId === sub.id ? "green.50" : "white"} borderRadius="md" border="1px" borderColor="gray.300">
+                <ListItem key={sub.id} p={3} bg={selectedSubGroupId === sub.id ? "green.50" : "white"} borderRadius="md"
+                  border="1px" borderColor="gray.300">
                   <Flex justify="space-between" align="center">
                     <Box cursor="pointer" onClick={() => setSelectedSubGroupId(sub.id)}>
                       <Text fontWeight="bold">{sub.name}</Text>
@@ -306,7 +317,7 @@ const TestMaster = () => {
                   <Input placeholder="Parameter Name" value={paramName} onChange={e => setParamName(e.target.value)} />
                   <Input placeholder="Unit (e.g. mg/dL)" value={paramUnit} onChange={e => setParamUnit(e.target.value)} />
                   <Textarea placeholder="Notes" value={paramNote} onChange={e => setParamNote(e.target.value)} />
-                  <Button onClick={addRangeRow}>➕ Add Range</Button>
+                  <Button isDisabled={!groupHasRanges} onClick={addRangeRow}>➕ Add Range</Button>
 
                   {ranges.map(r => (
                     <Stack key={r.id} direction={{ base: "column", md: "row" }} spacing={3}>

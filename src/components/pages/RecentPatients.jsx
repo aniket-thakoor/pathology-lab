@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Box, Heading, Input, VStack, Text, Button, List, ListItem,
+  Box, Heading, Input, Text, Button, List, ListItem,
   Divider, Badge, Flex
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
@@ -75,11 +75,11 @@ const RecentPatients = () => {
                 </Flex>
                 <Divider mb="2" />
                 <Flex gap="3" wrap="wrap">
-                  <Button size="sm" colorScheme="blue" onClick={() => resumeTestEntry(p)}>
-                    🧪 Edit Test Results
-                  </Button>
                   <Button size="sm" colorScheme="teal" onClick={() => editPatientProfile(p)}>
                     ✏️ Edit Patient Info
+                  </Button>
+                  <Button size="sm" colorScheme="blue" onClick={() => resumeTestEntry(p)}>
+                    🧪 Edit Test Results
                   </Button>
                   {p.status === 'complete' && (
                     <Button size="sm" colorScheme="gray" onClick={() => viewSummaryReport(p)}>

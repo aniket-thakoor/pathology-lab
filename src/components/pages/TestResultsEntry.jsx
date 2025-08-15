@@ -39,7 +39,7 @@ const TestResultsEntry = () => {
       getTestGroups()
     ]).then(([pat, test, res, grp]) => {
       setPatient(pat || {});
-      setSelectedTests(test || {});
+      setSelectedTests(test || []);
       setResults(res || {});
       setGroups(grp || []);
     });
@@ -83,6 +83,11 @@ const TestResultsEntry = () => {
     await putSelectedTests(preloadId, selectedTests)
     //setPatient(prev => ({ ...prev, selectedTests }));
     setShowTestModal(false);
+  };
+
+  const isFloat = (val) => {
+    const parsed = parseFloat(val);
+    return !isNaN(parsed) && String(parsed) === val.trim();
   };
 
   return (
@@ -144,14 +149,13 @@ const TestResultsEntry = () => {
                   <VStack spacing="3" align="stretch">
                     {sub.parameters.map(param => {
                       const val = parseFloat(results[param.id]);
-                      const abnormal = isAbnormal(val, param);
+                      const abnormal = isFloat(results[param.id]) ? isAbnormal(val, param) : false;
                       const range = getRange(param);
 
                       return (
                         <Box key={param.id}>
                           <Text fontWeight="semibold">{param.name}</Text>
                           <Input
-                            type="number"
                             value={results[param.id] || ''}
                             onChange={e => handleChangeResult(param.id, e.target.value)}
                             borderColor={abnormal ? "red.400" : "green.400"}

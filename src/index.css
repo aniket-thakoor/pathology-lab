@@ -105,8 +105,9 @@ button:focus-visible {
     margin: 0 auto;
     width: 794px;             /* A4 width at 96 DPI */
     min-height: 1123px;       /* A4 height at 96 DPI */
-    padding: 30px;
-    font-size: 12px;
+    margin-left: 14px;
+    margin-right: 14px;
+    font-size: 14px;
     box-shadow: none;
     page-break-inside: avoid;
   }

@@ -84,7 +84,7 @@ export const updateSelectedTests = async (patientId, updates) => {
 export const getSelectedTests = async (patientId) => {
   const db = await getDB();
   const record = await db.get('selectedTests', patientId);
-  return record?.tests || {};
+  return record?.tests || [];
 };
 
 // Save or Replace Test Results

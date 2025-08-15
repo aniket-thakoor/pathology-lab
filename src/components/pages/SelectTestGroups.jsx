@@ -4,25 +4,26 @@ import {
   Button, useToast
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { getTestGroups, putSelectedTests } from '@/services/dbService';
+import { getTestGroups, putSelectedTests, getSelectedTests } from '@/services/dbService';
 
 const SelectTestGroups = () => {
   const toast = useToast();
   const navigate = useNavigate();
   const [testGroups, setTestGroups] = useState([]);
   const [selected, setSelected] = useState([]);
-  const [patientId, setPatientId] = useState(null);
+  const preloadId = sessionStorage.getItem('editPatientId');
 
   useEffect(() => {
-    const preloadId = sessionStorage.getItem('editPatientId');
-    setPatientId(preloadId);
-    fetchTestGroups(preloadId);
-  }, []);
+    if (!preloadId) return;
 
-  const fetchTestGroups = async () => {
-    const data = await getTestGroups();
-    setTestGroups(data || []);
-  };
+    Promise.all([
+      getTestGroups(),
+      getSelectedTests(preloadId)
+    ]).then(([test, selected]) => {
+      setTestGroups(test || []);
+      setSelected(selected || []);
+    });
+  }, [preloadId]);
 
   const handleToggle = (id) => {
     setSelected(prev =>
@@ -31,7 +32,7 @@ const SelectTestGroups = () => {
   };
 
   const handleSave = async () => {
-    if (!patientId) {
+    if (!preloadId) {
       toast({ title: 'Patient context missing.', status: 'error' });
       return;
     }
@@ -41,7 +42,7 @@ const SelectTestGroups = () => {
     //   updatedAt: new Date().toISOString()
     // });
 
-    await putSelectedTests(patientId, selected);
+    await putSelectedTests(preloadId, selected);
 
     toast({ title: 'Test groups updated.', status: 'success' });
     navigate('/results');

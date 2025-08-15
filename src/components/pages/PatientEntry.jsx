@@ -61,6 +61,9 @@ const PatientEntry = () => {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
+  const capitalizeWords = (str) =>
+  str.replace(/\b\w/g, (char) => char.toUpperCase());
+
   const handleSelectMatch = (p) => {
     setForm({ ...p });
     sessionStorage.setItem('editPatientId', p.id);
@@ -105,7 +108,7 @@ const PatientEntry = () => {
 
   const handleSubmit = () => {
     const { name, gender, age, mobile, referredBy } = form;
-    if (!name || !gender || !age || !mobile || !referredBy) {
+    if (!name || !gender || !age) {
       toast({ title: 'Please fill all required fields.', status: 'warning' });
       return;
     }
@@ -138,7 +141,7 @@ const PatientEntry = () => {
       <VStack spacing="5" align="stretch">
         <FormControl isRequired>
           <FormLabel>Name</FormLabel>
-          <Input value={form.name} onChange={e => handleChange('name', e.target.value)} />
+          <Input value={form.name} onChange={e => handleChange('name', capitalizeWords(e.target.value))} />
         </FormControl>
 
         <Flex gap="4" wrap="wrap">
