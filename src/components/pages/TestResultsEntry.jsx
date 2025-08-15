@@ -16,6 +16,7 @@ import {
   putSelectedTests,
   getTestResults
 } from '@/services/dbService';
+import PageHeader from '../common/PageHeader';
 
 const TestResultsEntry = () => {
   const navigate = useNavigate();
@@ -91,19 +92,11 @@ const TestResultsEntry = () => {
   };
 
   return (
-    <Box p="6" maxW="900px" mx="auto">
-      <Flex align="center" justify="space-between" mb="4">
-        <Button
-          leftIcon={<ArrowBackIcon />}
-          onClick={() => navigate('/')}
-          variant="ghost"
-          size="sm"
-        >
-          Back to Home
-        </Button>
-        <Heading size="md">🧪 Enter Test Results</Heading>
-        <Box w="90px" />
-      </Flex>
+    <Box p="6"  mx="auto">
+      
+        <PageHeader title="🧪 Enter Test Results" fallbackHome="/" />
+        {/* <Box w="90px" /> */}
+
 
       {patient && (
         <>
@@ -199,11 +192,23 @@ const TestResultsEntry = () => {
             </ModalContent>
           </Modal>
 
-          {/* Save Buttons */}
-          <Flex justify="space-between" mt="8">
-            <Button variant="outline" onClick={handleSaveAndExit}>💾 Save & Close</Button>
-            <Button colorScheme="blue" onClick={handleSaveAndContinue}>✅ Save & Continue</Button>
+          {/* Sticky Save Buttons */}
+          <Flex
+            position="fixed"
+            bottom="0"
+            left="0"
+            width="100%"
+            bg="white"
+            p="4"
+            justify="space-between"
+            borderTop="1px solid"
+            borderColor="gray.200"
+            zIndex="10"
+          >
+            <Button variant="outline" onClick={handleSaveAndExit} size="lg">💾 Save & Close</Button>
+            <Button colorScheme="blue" onClick={handleSaveAndContinue} size="lg">✅ Save & Continue</Button>
           </Flex>
+
         </>
       )}
     </Box>

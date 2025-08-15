@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Flex, Heading, VStack, Input, Textarea, Button, Select,
-  Divider, Text, List, ListItem, IconButton, useToast, Stack, Checkbox
+  Divider, Text, List, ListItem, IconButton, useToast, Stack, Checkbox,
+  AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader,
+  AlertDialogContent, AlertDialogOverlay, useDisclosure
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import {
@@ -9,6 +11,7 @@ import {
   deleteSubgroup, addParameterToSubgroup,
   updateParameterInSubgroup, deleteParameterFromSubgroup
 } from '@/services/dbService';
+import PageHeader from '../common/PageHeader';
 
 const TestMaster = () => {
   const toast = useToast();
@@ -26,15 +29,39 @@ const TestMaster = () => {
   const [paramNote, setParamNote] = useState('');
   const [ranges, setRanges] = useState([]);
   const [editingParamId, setEditingParamId] = useState('');
-
-  useEffect(() => { getTestGroups().then(setGroups); }, []);
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = React.useRef();
+  const [checkedFirstVisit, setCheckedFirstVisit] = useState(false);
   const selectedGroup = groups.find(g => g.id === selectedGroupId);
   const selectedSubGroup = selectedGroup?.subGroups?.find(sg => sg.id === selectedSubGroupId);
 
   const syncGroups = async () => {
     const updated = await getTestGroups();
     setGroups(updated);
+  };
+
+  useEffect(() => {
+    getTestGroups().then(setGroups);
+    async function checkFirstVisit() {
+      const tests = await getTestGroups();
+      if (tests.length === 0) {
+        onOpen(); // prompt to load defaults
+      }
+      setCheckedFirstVisit(true);
+    }
+    checkFirstVisit();
+  }, [onOpen]);
+
+  const handleLoadDefaults = async () => {
+    try {
+      const res = await fetch('/data/default-tests.json');
+      const defaultTests = await res.json();
+      await putTestGroups(defaultTests);
+      setGroups(defaultTests);
+      onClose();
+    } catch (err) {
+      console.error('Failed to load defaults:', err);
+    }
   };
 
   const resetAll = () => {
@@ -206,7 +233,7 @@ const TestMaster = () => {
       }
     };
     reader.readAsText(file);
-  };  
+  };
 
   const addRangeRow = () =>
     setRanges(r => [...r, { id: Date.now(), type: 'Common', min: '', max: '', note: '' }]);
@@ -218,140 +245,167 @@ const TestMaster = () => {
     setRanges(r => r.filter(row => row.id !== id));
 
   return (
-    <Flex direction={{ base: "column", md: "row" }} wrap="wrap" p={4} gap={6}>
-      {/* Sidebar: Groups */}
-      <Box w={{ base: "100%", md: "320px" }} bg="gray.100" p={4} borderRadius="md">
-      <Flex justify="space-between" gap="4" mb="6">
-        <Button colorScheme="blue" onClick={handleExport}>📤 Export</Button>
-        <Input type="file" id="import-json" display="none" accept=".json" onChange={handleImport} />
-        <Button as="label" htmlFor="import-json" colorScheme="green">📥 Import</Button>
+    
+    <>
+      <Flex direction={{ base: "column", md: "row" }} wrap="wrap" p={4} gap={6}>
+        {/* Sidebar: Groups */}
+        <Box w={{ base: "100%", md: "320px" }} bg="gray.100" p={4} borderRadius="md">
+          <PageHeader title="🧪 Test Groups" fallbackHome="/" />
+          <Flex justify="space-between" gap="1" mb="6">
+            <Button colorScheme="blue" onClick={handleExport}>📤 Export</Button>
+            <Button colorScheme="teal" onClick={handleLoadDefaults}>📥 Defaults</Button>
+            <Input type="file" id="import-json" display="none" accept=".json" onChange={handleImport} />
+            <Button as="label" htmlFor="import-json" colorScheme="green">📥 Import</Button>
+          </Flex>
+          <List spacing={2}>
+            {groups.map(g => (
+              <ListItem key={g.id} p={2} bg={selectedGroupId === g.id ? "blue.100" : "white"} borderRadius="md">
+                <Flex justify="space-between" align="center">
+                  <Box onClick={() => setSelectedGroupId(g.id)} cursor="pointer">
+                    <Text fontWeight="bold">{g.name}</Text>
+                  </Box>
+                  <Stack direction="row">
+                    <IconButton size="sm" icon={<EditIcon />} onClick={() => editGroup(g)} />
+                    <IconButton size="sm" icon={<DeleteIcon />} onClick={() => deleteGroup(g.id)} />
+                  </Stack>
+                </Flex>
+              </ListItem>
+            ))}
+          </List>
+
+          <VStack spacing={3} mt={4}>
+            <Input placeholder="Group Name" value={groupName} onChange={e => setGroupName(e.target.value)} />
+            <Textarea placeholder="Description" value={groupDesc} onChange={e => setGroupDesc(e.target.value)} />
+            <Checkbox 
+              isChecked={groupHasRanges}
+              onChange={e => setGroupHasRanges(e.target.checked)}
+            >
+              Has Reference Range / Units?
+            </Checkbox>
+            <Button onClick={saveGroup}>
+              {editingGroupId ? '💾 Update Group' : '➕ Create Group'}
+            </Button>
+            <Button size="sm" onClick={resetAll}>➕ Add Another</Button>
+          </VStack>
+        </Box>
+
+        {/* Main Panel */}
+        <Box flex="1" minW="300px">
+          {selectedGroup && (
+            <>
+              <Heading size="md" mb={4}>📂 Subgroups in "{selectedGroup.name}"</Heading>
+              <Button size="sm" mb={2} onClick={() => setSelectedGroupId('')}>⬅️ Back to Groups</Button>
+              <List spacing={3}>
+                {selectedGroup.subGroups.map(sub => (
+                  <ListItem key={sub.id} p={3} bg={selectedSubGroupId === sub.id ? "green.50" : "white"} borderRadius="md"
+                    border="1px" borderColor="gray.300">
+                    <Flex justify="space-between" align="center">
+                      <Box cursor="pointer" onClick={() => setSelectedSubGroupId(sub.id)}>
+                        <Text fontWeight="bold">{sub.name}</Text>
+                        <Text fontSize="sm" color="gray.500">{sub.parameters?.length || 0} parameters</Text>
+                      </Box>
+                      <Stack direction="row">
+                        <IconButton size="sm" icon={<EditIcon />} onClick={() => editSubGroup(sub)} />
+                        <IconButton size="sm" icon={<DeleteIcon />} onClick={() => handleDeleteSubGroup(sub.id)} />
+                      </Stack>
+                    </Flex>
+                  </ListItem>
+                ))}
+              </List>
+
+              <VStack spacing={3} mt={4}>
+                <Input placeholder="Subgroup Name" value={subGroupName} onChange={e => setSubGroupName(e.target.value)} />
+                <Button onClick={saveSubGroup}>
+                  {editingSubGroupId ? '💾 Update Subgroup' : '➕ Add Subgroup'}
+                </Button>
+                <Button size="sm" onClick={() => setSelectedSubGroupId('')}>➕ Add Another Subgroup</Button>
+              </VStack>
+
+              <Divider my={6} />
+
+              {selectedSubGroup && (
+                <>
+                  <Heading size="md" mb={4}>📊 Parameters in "{selectedSubGroup.name}"</Heading>
+                  <List spacing={3}>
+                    {selectedSubGroup.parameters.map(p => (
+                      <ListItem key={p.id} p={3} bg="gray.50" borderRadius="md" border="1px" borderColor="gray.300">
+                        <Flex justify="space-between" align="center">
+                          <Box>
+                            <Text fontWeight="bold">{p.name} ({p.unit})</Text>
+                            <Text fontSize="sm" color="gray.500">{Object.keys(p.ranges).length} range(s)</Text>
+                          </Box>
+                          <Stack direction="row">
+                            <IconButton size="sm" icon={<EditIcon />} onClick={() => editParameter(p)} />
+                            <IconButton size="sm" icon={<DeleteIcon />} onClick={() => handleDeleteParameter(p.id)} />
+                          </Stack>
+                        </Flex>
+                      </ListItem>
+                    ))}
+                  </List>
+
+                  <VStack spacing={3} mt={4}>
+                    <Input placeholder="Parameter Name" value={paramName} onChange={e => setParamName(e.target.value)} />
+                    <Input placeholder="Unit (e.g. mg/dL)" value={paramUnit} onChange={e => setParamUnit(e.target.value)} />
+                    <Textarea placeholder="Notes" value={paramNote} onChange={e => setParamNote(e.target.value)} />
+                    <Button isDisabled={!groupHasRanges} onClick={addRangeRow}>➕ Add Range</Button>
+
+                    {ranges.map(r => (
+                      <Stack key={r.id} direction={{ base: "column", md: "row" }} spacing={3}>
+                        <Select value={r.type} onChange={e => updateRange(r.id, 'type', e.target.value)}>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Common">Common</option>
+                        </Select>
+                        <Input placeholder="Min" type="number" value={r.min} onChange={e => updateRange(r.id, 'min', e.target.value)} />
+                        <Input placeholder="Max" type="number" value={r.max} onChange={e => updateRange(r.id, 'max', e.target.value)} />
+                        <Input placeholder="Note" value={r.note} onChange={e => updateRange(r.id, 'note', e.target.value)} />
+                        <IconButton icon={<DeleteIcon />} onClick={() => removeRange(r.id)} />
+                      </Stack>
+                    ))}
+
+                    <Button onClick={saveParameter}>
+                      {editingParamId ? '💾 Update Parameter' : '💾 Save Parameter'}
+                    </Button>
+                    <Button size="sm" onClick={() => {
+                      setEditingParamId('');
+                      setParamName('');
+                      setParamUnit('');
+                      setParamNote('');
+                      setRanges([]);
+                    }}>
+                      ➕ Add Another Parameter
+                    </Button>
+                  </VStack>
+                </>
+              )}
+            </>
+          )}
+        </Box>
       </Flex>
-        <Heading size="md" mb={4}>🧪 Test Groups</Heading>
-        <List spacing={2}>
-          {groups.map(g => (
-            <ListItem key={g.id} p={2} bg={selectedGroupId === g.id ? "blue.100" : "white"} borderRadius="md">
-              <Flex justify="space-between" align="center">
-                <Box onClick={() => setSelectedGroupId(g.id)} cursor="pointer">
-                  <Text fontWeight="bold">{g.name}</Text>
-                </Box>
-                <Stack direction="row">
-                  <IconButton size="sm" icon={<EditIcon />} onClick={() => editGroup(g)} />
-                  <IconButton size="sm" icon={<DeleteIcon />} onClick={() => deleteGroup(g.id)} />
-                </Stack>
-              </Flex>
-            </ListItem>
-          ))}
-        </List>
 
-        <VStack spacing={3} mt={4}>
-          <Input placeholder="Group Name" value={groupName} onChange={e => setGroupName(e.target.value)} />
-          <Textarea placeholder="Description" value={groupDesc} onChange={e => setGroupDesc(e.target.value)} />
-          <Checkbox 
-            isChecked={groupHasRanges}
-            onChange={e => setGroupHasRanges(e.target.checked)}
-          >
-            Has Reference Range / Units?
-          </Checkbox>
-          <Button onClick={saveGroup}>
-            {editingGroupId ? '💾 Update Group' : '➕ Create Group'}
-          </Button>
-          <Button size="sm" onClick={resetAll}>➕ Add Another</Button>
-        </VStack>
-      </Box>
+      <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Load Default Test Setup?
+            </AlertDialogHeader>
 
-      {/* Main Panel */}
-      <Box flex="1" minW="300px">
-        {selectedGroup && (
-          <>
-            <Heading size="md" mb={4}>📂 Subgroups in "{selectedGroup.name}"</Heading>
-            <Button size="sm" mb={2} onClick={() => setSelectedGroupId('')}>⬅️ Back to Groups</Button>
-            <List spacing={3}>
-              {selectedGroup.subGroups.map(sub => (
-                <ListItem key={sub.id} p={3} bg={selectedSubGroupId === sub.id ? "green.50" : "white"} borderRadius="md"
-                  border="1px" borderColor="gray.300">
-                  <Flex justify="space-between" align="center">
-                    <Box cursor="pointer" onClick={() => setSelectedSubGroupId(sub.id)}>
-                      <Text fontWeight="bold">{sub.name}</Text>
-                      <Text fontSize="sm" color="gray.500">{sub.parameters?.length || 0} parameters</Text>
-                    </Box>
-                    <Stack direction="row">
-                      <IconButton size="sm" icon={<EditIcon />} onClick={() => editSubGroup(sub)} />
-                      <IconButton size="sm" icon={<DeleteIcon />} onClick={() => handleDeleteSubGroup(sub.id)} />
-                    </Stack>
-                  </Flex>
-                </ListItem>
-              ))}
-            </List>
+            <AlertDialogBody>
+              No tests found. Would you like to load the default setup to get started?
+            </AlertDialogBody>
 
-            <VStack spacing={3} mt={4}>
-              <Input placeholder="Subgroup Name" value={subGroupName} onChange={e => setSubGroupName(e.target.value)} />
-              <Button onClick={saveSubGroup}>
-                {editingSubGroupId ? '💾 Update Subgroup' : '➕ Add Subgroup'}
+            <AlertDialogFooter>
+              <Button colorScheme="blue" onClick={handleLoadDefaults}>
+                Yes, Load Defaults
               </Button>
-              <Button size="sm" onClick={() => setSelectedSubGroupId('')}>➕ Add Another Subgroup</Button>
-            </VStack>
-
-            <Divider my={6} />
-
-            {selectedSubGroup && (
-              <>
-                <Heading size="md" mb={4}>📊 Parameters in "{selectedSubGroup.name}"</Heading>
-                <List spacing={3}>
-                  {selectedSubGroup.parameters.map(p => (
-                    <ListItem key={p.id} p={3} bg="gray.50" borderRadius="md" border="1px" borderColor="gray.300">
-                      <Flex justify="space-between" align="center">
-                        <Box>
-                          <Text fontWeight="bold">{p.name} ({p.unit})</Text>
-                          <Text fontSize="sm" color="gray.500">{Object.keys(p.ranges).length} range(s)</Text>
-                        </Box>
-                        <Stack direction="row">
-                          <IconButton size="sm" icon={<EditIcon />} onClick={() => editParameter(p)} />
-                          <IconButton size="sm" icon={<DeleteIcon />} onClick={() => handleDeleteParameter(p.id)} />
-                        </Stack>
-                      </Flex>
-                    </ListItem>
-                  ))}
-                </List>
-
-                <VStack spacing={3} mt={4}>
-                  <Input placeholder="Parameter Name" value={paramName} onChange={e => setParamName(e.target.value)} />
-                  <Input placeholder="Unit (e.g. mg/dL)" value={paramUnit} onChange={e => setParamUnit(e.target.value)} />
-                  <Textarea placeholder="Notes" value={paramNote} onChange={e => setParamNote(e.target.value)} />
-                  <Button isDisabled={!groupHasRanges} onClick={addRangeRow}>➕ Add Range</Button>
-
-                  {ranges.map(r => (
-                    <Stack key={r.id} direction={{ base: "column", md: "row" }} spacing={3}>
-                      <Select value={r.type} onChange={e => updateRange(r.id, 'type', e.target.value)}>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Common">Common</option>
-                      </Select>
-                      <Input placeholder="Min" type="number" value={r.min} onChange={e => updateRange(r.id, 'min', e.target.value)} />
-                      <Input placeholder="Max" type="number" value={r.max} onChange={e => updateRange(r.id, 'max', e.target.value)} />
-                      <Input placeholder="Note" value={r.note} onChange={e => updateRange(r.id, 'note', e.target.value)} />
-                      <IconButton icon={<DeleteIcon />} onClick={() => removeRange(r.id)} />
-                    </Stack>
-                  ))}
-
-                  <Button onClick={saveParameter}>
-                    {editingParamId ? '💾 Update Parameter' : '💾 Save Parameter'}
-                  </Button>
-                  <Button size="sm" onClick={() => {
-                    setEditingParamId('');
-                    setParamName('');
-                    setParamUnit('');
-                    setParamNote('');
-                    setRanges([]);
-                  }}>
-                    ➕ Add Another Parameter
-                  </Button>
-                </VStack>
-              </>
-            )}
-          </>
-        )}
-      </Box>
-    </Flex>
+              <Button ref={cancelRef} onClick={onClose} ml={3}>
+                No, I'll add my own tests
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+    </>
   );
 };
 

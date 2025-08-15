@@ -8,6 +8,7 @@ import {
   getPatientById, getSelectedTests, getTestResults,
   getTestGroups, getLabDetails
 } from '@/services/dbService';
+import PageHeader from '../common/PageHeader';
 
 const SummaryReport = () => {
   const contentRef = useRef(null);
@@ -50,7 +51,7 @@ const SummaryReport = () => {
 
   return (
     <Box p="4">
-      <Heading size="md" mb="4">🧪 Test Results Summary</Heading>
+      <PageHeader title="🧬 Select Test Groups" fallbackHome="/" />
       <VStack align="start" spacing="4">
         <Text><strong>Name:</strong> {patient.name}</Text>
         <Text><strong>Age:</strong> {patient.age} • <strong>Gender:</strong> {patient.gender}</Text>

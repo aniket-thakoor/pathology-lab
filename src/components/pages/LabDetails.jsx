@@ -4,6 +4,8 @@ import {
   FormControl, FormLabel, VStack, Text, Image
 } from '@chakra-ui/react';
 import { getLabDetails, putLabDetails } from '@/services/dbService';
+import SignatureField from '../common/SignatureField';
+import PageHeader from '../common/PageHeader';
 
 const LabDetails = () => {
   const [details, setDetails] = useState({
@@ -82,7 +84,7 @@ const LabDetails = () => {
 
   return (
     <Box p="6" maxW="800px" mx="auto">
-      <Heading size="lg" mb="6">🏥 Enter Lab Details</Heading>
+      <PageHeader title="🏥 Enter Lab Details" fallbackHome="/" />
       <VStack spacing="5" align="stretch">
         {[
           ['Lab Name', 'labName'], ['Subheading', 'subHeading'],
@@ -102,23 +104,18 @@ const LabDetails = () => {
           <Textarea name="address" value={details.address} onChange={handleChange} />
         </FormControl>
 
-        <FormControl>
-          <FormLabel>Upload Signature</FormLabel>
-          <Input type="file" accept="image/*" onChange={handleSignatureUpload} />
-          {details.signature && (
-            <Box mt="2">
-              <Text fontSize="sm">Signature Preview:</Text>
-              <Image src={details.signature} alt="Signature" maxW="200px" mt="2" />
-            </Box>
-          )}
-        </FormControl>
+        <SignatureField
+          label="Authorized Signature"
+          value={details.signature}
+          onChange={(sig) => setDetails(prev => ({ ...prev, signature: sig }))}
+        />
 
         <Button colorScheme="blue" onClick={handleSave}>💾 Save Lab Details</Button>
-        <Button colorScheme="green" onClick={handleExport}>📤 Export to JSON</Button>
-      <FormControl>
-        <FormLabel>📥 Import from JSON</FormLabel>
-        <Input type="file" accept=".json" onChange={handleImport} />
-      </FormControl>
+        {/* <Button colorScheme="green" onClick={handleExport}>📤 Export to JSON</Button>
+        <FormControl>
+          <FormLabel>📥 Import from JSON</FormLabel>
+          <Input type="file" accept=".json" onChange={handleImport} />
+        </FormControl> */}
       </VStack>
     </Box>
   );

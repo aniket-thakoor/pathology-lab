@@ -10,6 +10,7 @@ import {
   putPatient,
   getTestGroups
 } from '@/services/dbService';
+import PageHeader from '../common/PageHeader';
 
 const PatientEntry = () => {
   const navigate = useNavigate();
@@ -136,7 +137,7 @@ const PatientEntry = () => {
 
   return (
     <Box p="6" maxW="800px" mx="auto">
-      <Heading mb="6">👤 Patient Entry</Heading>
+      <PageHeader title="👤 Patient Entry" fallbackHome="/" />
 
       <VStack spacing="5" align="stretch">
         <FormControl isRequired>

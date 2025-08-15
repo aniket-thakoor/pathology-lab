@@ -5,6 +5,7 @@ import {
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { usePatientStorage } from '@/hooks/usePatientStorage';
+import PageHeader from '../common/PageHeader';
 
 const RecentPatients = () => {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ const RecentPatients = () => {
 
   return (
     <Box p="6" maxW="800px" mx="auto">
-      <Heading mb="4">🕓 Recent Patients</Heading>
+      <PageHeader title="🕓 Recent Patients" fallbackHome="/" />
 
       <Input
         placeholder="🔍 Search by name, mobile or sample date"

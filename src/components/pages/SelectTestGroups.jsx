@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box, Heading, Checkbox, List, ListItem,
-  Button, useToast
+  Box, Heading, Checkbox, List, ListItem, Button, useToast, Flex
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { getTestGroups, putSelectedTests, getSelectedTests } from '@/services/dbService';
+import PageHeader from '../common/PageHeader';
 
 const SelectTestGroups = () => {
   const toast = useToast();
@@ -37,20 +37,27 @@ const SelectTestGroups = () => {
       return;
     }
 
-    // await updatePatient(patientId, {
-    //   selectedTests: selected,
-    //   updatedAt: new Date().toISOString()
-    // });
-
     await putSelectedTests(preloadId, selected);
 
     toast({ title: 'Test groups updated.', status: 'success' });
     navigate('/results');
   };
 
+  const handleSaveOnly = async () => {
+    if (!preloadId) {
+      toast({ title: 'Patient context missing.', status: 'error' });
+      return;
+    }
+
+    await putSelectedTests(preloadId, selected);
+
+    toast({ title: 'Test groups updated.', status: 'success' });
+    navigate('/');
+  };
+
   return (
     <Box p="6" maxW="600px" mx="auto">
-      <Heading mb="6">🧬 Select Test Groups</Heading>
+      <PageHeader title="🧬 Select Test Groups" fallbackHome="/" />
       <List spacing="4" mb="6">
         {testGroups.map(test => (
           <ListItem key={test.id}>
@@ -63,10 +70,22 @@ const SelectTestGroups = () => {
           </ListItem>
         ))}
       </List>
-
-      <Button colorScheme="blue" onClick={handleSave}>
-        ✅ Save & Proceed to Results
-      </Button>
+      {/* Sticky Save Buttons */}
+      <Flex
+        position="fixed"
+        bottom="0"
+        left="0"
+        width="100%"
+        bg="white"
+        p="4"
+        justify="space-between"
+        borderTop="1px solid"
+        borderColor="gray.200"
+        zIndex="10"
+      >
+        <Button variant="outline" onClick={handleSaveOnly} size="lg">💾 Save & Close</Button>
+        <Button colorScheme="blue" onClick={handleSave} size="lg">✅ Save & Continue</Button>
+      </Flex>
     </Box>
   );
 };
