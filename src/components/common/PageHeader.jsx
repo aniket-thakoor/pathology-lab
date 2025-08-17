@@ -2,6 +2,7 @@
 import React from 'react';
 import { Flex, Heading, IconButton, Tooltip, Box } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowBackIcon } from '@chakra-ui/icons';
 
 const canGoBack = () => {
   const state = window.history.state;
@@ -37,11 +38,11 @@ export default function PageHeader({ title, fallbackHome = '/' }) {
       <Tooltip label="Go Back" openDelay={300}>
         <IconButton
           aria-label="Go Back"
-          icon={<span style={{ fontSize: '1.25rem' }}>🡰</span>}
+          icon={<ArrowBackIcon />}
+          fontSize="22px"
           variant="ghost"
           onClick={handleBack}
           flexShrink={0}
-          mr={2}
         />
       </Tooltip>
 
