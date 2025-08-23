@@ -36,7 +36,6 @@ const SummaryReport = () => {
       setSelectedTests(test || []);
       setResults(res || {});
       setGroups(grp || []);
-      window.document.title = pat.name; // TODO: Find a better way to set the document title
     });
   }, [preloadId]);
 
@@ -48,7 +47,7 @@ const SummaryReport = () => {
   };
 
   return (
-    <Box p="4">
+    <Box p="6" minH="100vh">
       <PageHeader title="🧬 Report Summary" fallbackHome="/" />
       <VStack align="start" spacing="4">
         <Text><strong>Name:</strong> {patient.name}</Text>
@@ -74,7 +73,7 @@ const SummaryReport = () => {
               exportSummaryReport({ patient, labDetails, groups: selectedGroups, results, showRanges, showNotes })
             }
           >
-            🖨️ Print / Save PDF
+            🖨️ Download Report PDF
           </Button>
           <Button colorScheme = "green"
             onClick={() => {

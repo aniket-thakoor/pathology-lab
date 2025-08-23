@@ -10,6 +10,7 @@ import SummaryReport from './components/pages/SummaryReport';
 import LabDetails from './components/pages/LabDetails';
 import RecentPatients from './components/pages/RecentPatients';
 import SelectTestGroups from './components/pages/SelectTestGroups';
+import BackupRestore from './components/pages/BackupRestore';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/test-setup" element={<TestMaster />} />
           <Route path="/summary" element={<SummaryReport />} />
           <Route path="/lab-details" element={<LabDetails />} />
+          <Route path="/backup-restore" element={<BackupRestore />} />
         </Routes>
       </Router>
     </ChakraProvider>

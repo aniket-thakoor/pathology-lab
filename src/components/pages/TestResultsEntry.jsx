@@ -92,7 +92,7 @@ const TestResultsEntry = () => {
   };
 
   return (
-    <Box p="6"  mx="auto">
+    <Box minH="100vh" p="6" pb="100px">
       
         <PageHeader title="🧪 Enter Test Results" fallbackHome="/" />
         {/* <Box w="90px" /> */}
@@ -102,14 +102,16 @@ const TestResultsEntry = () => {
         <>
           {/* Patient Info */}
           <Box mb="6">
-            <Text><strong>Name:</strong> {patient.name}</Text>
-            <Text><strong>Age:</strong> {patient.age ?? '—'}</Text>
-            <Text><strong>New Born:</strong> {patient.isNewBorn ? 'Yes' : 'No'}</Text>
-            <Text><strong>Gender:</strong> {patient.gender}</Text>
-            <Text><strong>Mobile:</strong> {patient.mobile}</Text>
-            <Text><strong>Referred By:</strong> {patient.referredBy}</Text>
-            <Text><strong>Consultant Doctor:</strong> {patient.consultantDoctor}</Text>
-            <Text><strong>Sample Date:</strong> {patient.sampleDate?.split('T')[0]}</Text>
+            <Flex wrap="wrap" gap="2" align="center">
+              <Text><strong>Name:</strong> {patient.name}</Text>
+              <Text><strong>Age:</strong> {patient.age ?? '—'}</Text>
+              <Text><strong>Gender:</strong> {patient.gender}</Text>
+              {/* <Text><strong>Mobile:</strong> {patient.mobile}</Text>
+              <Text><strong>New Born:</strong> {patient.isNewBorn ? 'Yes' : 'No'}</Text>
+              <Text><strong>Referred By:</strong> {patient.referredBy}</Text>
+              <Text><strong>Consultant Doctor:</strong> {patient.consultantDoctor}</Text>
+              <Text><strong>Sample Date:</strong> {patient.sampleDate?.split('T')[0]}</Text> */}
+            </Flex>
           </Box>
 
           {/* Selected Tests */}
@@ -118,10 +120,10 @@ const TestResultsEntry = () => {
             <VStack align="start" spacing="2">
               {selectedGroups.map(g => (
                 <Box key={g.id}>
-                  <Text fontWeight="bold">{g.name}</Text>
-                  <Text fontSize="sm" color="gray.600">
+                  <Text >{g.name}</Text>
+                  {/* <Text fontSize="sm" color="gray.600">
                     {g.subGroups.map(sg => sg.name).join(', ')}
-                  </Text>
+                  </Text> */}
                 </Box>
               ))}
             </VStack>
@@ -197,7 +199,7 @@ const TestResultsEntry = () => {
             position="fixed"
             bottom="0"
             left="0"
-            width="100%"
+            gap="4"
             bg="white"
             p="4"
             justify="space-between"
@@ -205,8 +207,8 @@ const TestResultsEntry = () => {
             borderColor="gray.200"
             zIndex="10"
           >
-            <Button variant="outline" onClick={handleSaveAndExit} size="lg">💾 Save & Close</Button>
-            <Button colorScheme="blue" onClick={handleSaveAndContinue} size="lg">✅ Save & Continue</Button>
+            <Button variant="outline" onClick={handleSaveAndExit}>💾 Save & Close</Button>
+            <Button colorScheme="blue" onClick={handleSaveAndContinue}>✅ Save & Continue</Button>
           </Flex>
 
         </>

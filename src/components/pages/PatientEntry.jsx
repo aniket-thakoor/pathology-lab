@@ -104,6 +104,7 @@ const PatientEntry = () => {
       setEditingId(null);
       sessionStorage.removeItem('editPatientId');
       fetchPatients();
+      navigate('/');
     }
   };
 
@@ -136,7 +137,7 @@ const PatientEntry = () => {
   }, [form.name, form.mobile, patients]);
 
   return (
-    <Box p="6" maxW="800px" mx="auto">
+    <Box minH="100vh"  p="6">
       <PageHeader title="👤 Patient Entry" fallbackHome="/" />
 
       <VStack spacing="5" align="stretch">
@@ -223,7 +224,20 @@ const PatientEntry = () => {
           </List>
         </Box> */}
 
-        <Flex gap="4" mt="6">
+
+        {/* Sticky Save Buttons */}
+        <Flex
+          position="fixed"
+          bottom="0"
+          left="0"
+          gap="4"
+          bg="white"
+          p="4"
+          justify="space-between"
+          borderTop="1px solid"
+          borderColor="gray.200"
+          zIndex="10"
+        >
           <Button colorScheme="blue" onClick={handleSubmit}>✅ Save & Continue</Button>
           <Button variant="outline" onClick={handleSaveOnly}>💾 Save & Close</Button>
         </Flex>

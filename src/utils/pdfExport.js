@@ -56,7 +56,7 @@ const buildTable = (headers, bodyRows, widths) => ({
     fillColor: () => null,
     hLineWidth: () => 0.5,
     vLineWidth: () => 0,
-    hLineColor: () => '#ccc'
+    hLineColor: () => 'white'
   }
 });
 
@@ -66,7 +66,7 @@ const buildTable = (headers, bodyRows, widths) => ({
 const labHeader = (patient, labDetails) => ([
   { text: labDetails.labName || '', style: 'labTitle', alignment: 'center' },
   { text: labDetails.subHeading || '', style: 'labSub', alignment: 'center' },
-  { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 0.5, lineColor: 'white' }], margin: [0, 4, 0, 8] },
+  { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 0.5, lineColor: 'white' }], margin: [0, 4, 0, 4] },
   {
     columns: [
       [
@@ -97,7 +97,11 @@ const labHeader = (patient, labDetails) => ([
     ],
     [
       labelVal('Referred By: ', patient.referredBy, { alignment: 'right' }),
-      labelVal('Sample Collected On: ', patient.sampleDate, { alignment: 'right' })
+      labelVal('Sample Collected On: ', new Date(patient.sampleDate).toLocaleDateString('en-IN', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      }), { alignment: 'right' })
     ]
   )
 ]);
@@ -150,9 +154,9 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
     content.push({ text: group.name, alignment: 'center', style: 'sectionTitle' });
 
     const headers = [
-      { text: 'TEST DESCRIPTION', style: 'tableHeader' },
-      { text: 'OBSERVED VALUE', style: 'tableHeader', alignment: 'center' },
-      ...(group.hasRanges ? [{ text: 'REFERENCE RANGE', style: 'tableHeader', alignment: 'right' }] : [])
+      { text: 'TEST DESCRIPTION', style: 'tableHeader', decoration: 'underline' },
+      { text: 'OBSERVED VALUE', style: 'tableHeader', alignment: 'center', decoration: 'underline' },
+      ...(group.hasRanges ? [{ text: 'REFERENCE RANGE', style: 'tableHeader', alignment: 'right', decoration: 'underline' }] : [])
     ];
 
     const rows = [];
@@ -186,7 +190,7 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
       });
     });
 
-    content.push(buildTable(headers, rows, group.hasRanges ? ['38%', '32%', '30%'] : ['*', 'auto']));
+    content.push(buildTable(headers, rows, group.hasRanges ? ['33.34%', '33.33%', '33.33%'] : ['*', 'auto']));
 
     if (group.desc) {
       content.push({

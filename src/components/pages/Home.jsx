@@ -30,7 +30,7 @@ const Home = () => {
 
   return (
     <FirstTimeSetupGuard>
-      <Box p="6">
+      <Box minH="100vh" display="flex" flexDirection="column" p="6">
         {/* Header Branding */}
         <Box mb="6" textAlign="center">
           <Heading size="lg" color="blue.700">🔬 {labDetails.labName}</Heading>
@@ -72,6 +72,11 @@ const Home = () => {
               📝 Edit Lab Info
             </Button>
           </GridItem>
+          <GridItem>
+            <Button size="lg" colorScheme="green" w="100%" onClick={() => navigate('/backup-restore')}>
+              💾 Backup / Restore
+            </Button>
+          </GridItem>
         </Grid>
 
         {/* Dashboard Stats */}
@@ -96,7 +101,7 @@ const Home = () => {
         </Flex>
 
         {/* Footer */}
-        <Box mt="10" textAlign="center" color="gray.500" fontSize="sm">
+        <Box mt="auto" textAlign="center" color="gray.500" fontSize="sm">
           Made with ❤️ for {labDetails.labName} • {new Date().toLocaleDateString()}
         </Box>
       </Box>
