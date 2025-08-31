@@ -18,6 +18,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/assets" element={<Home />} />
           <Route path="/patients" element={<RecentPatients />} />
           <Route path="/patient" element={<PatientEntry />} />
           <Route path="/select-tests" element={<SelectTestGroups />} />

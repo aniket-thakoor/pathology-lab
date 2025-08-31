@@ -6,6 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+android/*.gradle
 
 # React + Chakra UI + Build Artifacts
 node_modules
@@ -30,3 +31,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+android/
+
+*.pem
+*.key
+*.crt
+node_modules/.vite-plugin-mkcert/
+

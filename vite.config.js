@@ -19,11 +19,11 @@ export default defineConfig({
     })
   ],
   server: {
-    https: true,     // enable SSL
+    https: false,     // enable SSL
     host: true       // allow LAN access for device testing
   },
   preview: {
-    https: true
+    https: false
   },
   resolve: {
     alias: {
