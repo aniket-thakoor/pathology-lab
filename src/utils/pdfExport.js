@@ -1,12 +1,25 @@
 import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts.js';
-pdfMake.vfs = pdfFonts.vfs;
+// import pdfFonts from 'pdfmake/build/vfs_fonts.js';
+// pdfMake.vfs = pdfFonts.vfs;
+import { vfs } from "@/fonts/vfs_fonts";
+
+pdfMake.vfs = vfs;
+
+pdfMake.fonts = {
+  PathLabFont: {
+    normal: 'CourierPrime-Regular.ttf',
+    bold: 'CourierPrime-Bold.ttf',
+    italics: 'CourierPrime-Italic.ttf',
+    bolditalics: 'CourierPrime-BoldItalic.ttf'
+  }
+};
+
 
 /**
  * Common styles
  */
 const styles = {
-  labTitle: { fontSize: 20, bold: true, color: '#000', margin: [0, 0, 0, 4] },
+  labTitle: { fontSize: 20, bold: true, color: '#333', margin: [0, 0, 0, 4] },
   labSub: { fontSize: 11, italics: true, color: '#555', margin: [0, 0, 0, 6] },
   sectionTitle: { fontSize: 13, bold: true, margin: [0, 8, 0, 4], color: '#000' },
   bodyLabel: { fontSize: 9, bold: true },
@@ -147,12 +160,11 @@ const footer = (labDetails) => ({
  */
 export function getSummaryReportDocDef({ patient, labDetails, groups, results, showRanges, showNotes }) {
   const content = [];
-
+  
   groups.forEach((group, idx) => {
     if (idx > 0) content.push({ text: '', pageBreak: 'before' });
     content.push(...labHeader(patient, labDetails));
-    content.push({ text: group.name, alignment: 'center', style: 'sectionTitle' });
-
+    content.push({ text: group.classification ? group.classification : group.name, alignment: 'center', style: 'sectionTitle' });
     const headers = [
       { text: 'TEST DESCRIPTION', style: 'tableHeader', decoration: 'underline' },
       { text: 'OBSERVED VALUE', style: 'tableHeader', alignment: 'center', decoration: 'underline' },
@@ -161,13 +173,12 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
 
     const rows = [];
     group.subGroups.forEach(sub => {
-      rows.push([
-        { text: sub.name, colSpan: group.hasRanges ? 3 : 2, bold: true, fontSize: 9, decoration: 'underline' },
-        ...(group.hasRanges ? ['', ''] : [''])
-      ]);
+      const subRows = [];
 
       sub.parameters.forEach(param => {
-        const val = results[param.id] || '-';
+        const val = results[param.id];
+        if (!val) return; // skip empty values
+
         const rangeText = Object.entries(param.ranges || {}).map(([_, r]) => `${r.min}–${r.max}`).join(' | ');
         const abnormal = (() => {
           const r = param.ranges?.[patient.gender] || param.ranges?.Common;
@@ -176,7 +187,7 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
 
         const row = [
           { text: param.name, style: 'bodyValue' },
-          { text: val, style: abnormal ? 'abnormalValue' : 'bodyValue', alignment: 'center' }
+          { text: val, style: abnormal ? 'abnormalValue' : 'bodyValue', alignment: group.hasRanges ? 'center' : 'left' }
         ];
         if (group.hasRanges) {
           row.push({
@@ -186,9 +197,19 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
             noWrap: true
           });
         }
-        rows.push(row);
+
+        subRows.push(row);
       });
+
+      if (subRows.length > 0) {
+        rows.push([
+          { text: sub.name, colSpan: group.hasRanges ? 3 : 2, bold: true, fontSize: 9, decoration: 'underline' },
+          ...(group.hasRanges ? ['', ''] : [''])
+        ]);
+        rows.push(...subRows);
+      }
     });
+
 
     content.push(buildTable(headers, rows, group.hasRanges ? ['33.34%', '33.33%', '33.33%'] : ['*', 'auto']));
 
@@ -214,6 +235,14 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
         margin: [0, 16, 0, 0]
       });
     }
+
+    content.push({
+      text: '-- End of Report --',
+      style: 'bodyValue',
+      alignment: 'center',
+      bold: true,
+      margin: [0, 20, 0, 0]
+    });
   });
 
   return {
@@ -221,7 +250,7 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
     pageMargins: [20, 20, 20, 100],
     content,
     styles,
-    defaultStyle: { fontSize: 10 },
+    defaultStyle: { font: 'PathLabFont', fontSize: 10 },
     footer: () => footer(labDetails)
   };
 }
