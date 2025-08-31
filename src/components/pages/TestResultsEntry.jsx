@@ -17,6 +17,7 @@ import {
   getTestResults
 } from '@/services/dbService';
 import PageHeader from '../common/PageHeader';
+import PageFooter from '../common/PageFooter';
 
 const TestResultsEntry = () => {
   const navigate = useNavigate();
@@ -193,26 +194,12 @@ const TestResultsEntry = () => {
               </ModalFooter>
             </ModalContent>
           </Modal>
-
-          {/* Sticky Save Buttons */}
-          <Flex
-            position="fixed"
-            bottom="0"
-            left="0"
-            gap="4"
-            bg="white"
-            p="4"
-            justify="space-between"
-            borderTop="1px solid"
-            borderColor="gray.200"
-            zIndex="10"
-          >
-            <Button variant="outline" onClick={handleSaveAndExit}>💾 Save & Close</Button>
-            <Button colorScheme="blue" onClick={handleSaveAndContinue}>✅ Save & Continue</Button>
-          </Flex>
-
         </>
       )}
+      <PageFooter
+        onSaveClose={handleSaveAndExit}
+        onSaveContinue={handleSaveAndContinue}
+      />
     </Box>
   );
 };

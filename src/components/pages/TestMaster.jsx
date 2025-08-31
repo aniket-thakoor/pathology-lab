@@ -20,6 +20,7 @@ const TestMaster = () => {
   const [selectedSubGroupId, setSelectedSubGroupId] = useState('');
   const [groupName, setGroupName] = useState('');
   const [groupDesc, setGroupDesc] = useState('');
+  const [groupClassification, setGroupClassification] = useState('');
   const [groupHasRanges, setGroupHasRanges] = useState(true);
   const [editingGroupId, setEditingGroupId] = useState('');
   const [subGroupName, setSubGroupName] = useState('');
@@ -69,6 +70,7 @@ const TestMaster = () => {
     setSelectedSubGroupId('');
     setGroupName('');
     setGroupDesc('');
+    setGroupClassification('');
     setGroupHasRanges(true);
     setSubGroupName('');
     setParamName('');
@@ -86,7 +88,8 @@ const TestMaster = () => {
       id: editingGroupId || Date.now().toString(),
       name: groupName,
       desc: groupDesc,
-      hasRanges: groupHasRanges
+      hasRanges: groupHasRanges,
+      classification: groupClassification
     };
     !editingGroupId && (group.subGroups = []);
     const updated = editingGroupId
@@ -97,6 +100,7 @@ const TestMaster = () => {
     setGroupName('');
     setGroupDesc('');
     setGroupHasRanges(true);
+    setGroupClassification('');
     setEditingGroupId('');
     setSelectedGroupId(group.id);
     toast({ title: editingGroupId ? 'Group updated' : 'Group created', status: 'success' });
@@ -161,6 +165,7 @@ const TestMaster = () => {
     setGroupName(g.name);
     setGroupDesc(g.desc);
     setGroupHasRanges(g.hasRanges);
+    setGroupClassification(g.classification);
     setEditingGroupId(g.id);
     setSelectedGroupId(g.id);
   };
@@ -276,6 +281,7 @@ const TestMaster = () => {
           <VStack spacing={3} mt={4}>
             <Input placeholder="Group Name" value={groupName} onChange={e => setGroupName(e.target.value)} />
             <Textarea placeholder="Description" value={groupDesc} onChange={e => setGroupDesc(e.target.value)} />
+            <Input placeholder="Classification" value={groupClassification} onChange={e => setGroupClassification(e.target.value)} />
             <Checkbox 
               isChecked={groupHasRanges}
               onChange={e => setGroupHasRanges(e.target.checked)}

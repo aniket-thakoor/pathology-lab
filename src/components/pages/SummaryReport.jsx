@@ -47,7 +47,7 @@ const SummaryReport = () => {
   };
 
   return (
-    <Box p="6" minH="100vh">
+    <Box p="6" minH="100vh" pb="100px">
       <PageHeader title="🧬 Report Summary" fallbackHome="/" />
       <VStack align="start" spacing="4">
         <Text><strong>Name:</strong> {patient.name}</Text>
@@ -73,7 +73,7 @@ const SummaryReport = () => {
               exportSummaryReport({ patient, labDetails, groups: selectedGroups, results, showRanges, showNotes })
             }
           >
-            🖨️ Download Report PDF
+            🖨️ Download Report
           </Button>
           <Button colorScheme = "green"
             onClick={() => {
@@ -91,31 +91,10 @@ const SummaryReport = () => {
               });
             }}
           >
-            📤 Share
+            📤 Share Report
           </Button>
         </Flex>
       </VStack>
-
-      <Box style={{ display: 'none' }} p="6" maxW="900px" mx="auto">
-        <Flex align="center" justify="space-between" mb="4">
-          <Heading mb="4">📄 Summary Report</Heading>
-          <Box w="90px" />
-        </Flex>
-  
-        {/* Controls */}
-        <Flex justify="space-between" mb="6" align="center" wrap="wrap">
-          <Box>
-            <Text fontSize="xl" fontWeight="bold">🔬 {labDetails.labName}</Text>
-            <Text fontSize="sm">{labDetails.address}</Text>
-          </Box>
-          {/* <Flex gap="4" align="center" mt={{ base: 4, md: 0 }}>
-            <Switch isChecked={showRanges} onChange={e => setShowRanges(e.target.checked)} />
-            <Text fontSize="sm">Show Ranges</Text>
-            <Switch isChecked={showNotes} onChange={e => setShowNotes(e.target.checked)} />
-            <Text fontSize="sm">Show Notes</Text>
-          </Flex> */}
-        </Flex>
-      </Box>
     </Box>
   );
 };

@@ -6,6 +6,7 @@ import {
 import { getLabDetails, putLabDetails } from '@/services/dbService';
 import SignatureField from '../common/SignatureField';
 import PageHeader from '../common/PageHeader';
+import PageFooter from '../common/PageFooter';
 import { useNavigate } from 'react-router-dom';
 
 const LabDetails = () => {
@@ -38,9 +39,9 @@ const LabDetails = () => {
   };
 
   const handleSave = async () => {
-    // Validate that all fields are filled
+    // Validate that all fields except email are filled
     const emptyFields = Object.entries(details)
-      .filter(([key, value]) => !String(value).trim())
+      .filter(([key, value]) => key !== 'email' && !String(value).trim())
       .map(([key]) => key);
 
     if (emptyFields.length > 0) {
@@ -82,7 +83,7 @@ const LabDetails = () => {
   };
 
   return (
-    <Box p="6" maxW="800px" mx="auto">
+    <Box p="6" maxW="800px" mx="auto" pb="24">
       <PageHeader title="🏥 Enter Lab Details" fallbackHome="/" />
       <VStack spacing="5" align="stretch">
         {[
@@ -118,8 +119,11 @@ const LabDetails = () => {
           <Input type="file" accept=".json" onChange={handleImport} />
         </FormControl>
 
-        <Button colorScheme="blue" onClick={handleSave}>💾 Save Lab Details & Close</Button>
       </VStack>
+      <PageFooter
+        onSaveContinue={handleSave}
+        saveContinueLabel = "💾 Save Lab Details & Close"
+      />
     </Box>
   );
 };

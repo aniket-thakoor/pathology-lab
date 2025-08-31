@@ -11,6 +11,7 @@ import {
   getTestGroups
 } from '@/services/dbService';
 import PageHeader from '../common/PageHeader';
+import PageFooter from '../common/PageFooter';
 
 const PatientEntry = () => {
   const navigate = useNavigate();
@@ -137,7 +138,7 @@ const PatientEntry = () => {
   }, [form.name, form.mobile, patients]);
 
   return (
-    <Box minH="100vh"  p="6">
+    <Box minH="100vh"  p="6" pb="100px">
       <PageHeader title="👤 Patient Entry" fallbackHome="/" />
 
       <VStack spacing="5" align="stretch">
@@ -223,25 +224,11 @@ const PatientEntry = () => {
             ))}
           </List>
         </Box> */}
-
-
-        {/* Sticky Save Buttons */}
-        <Flex
-          position="fixed"
-          bottom="0"
-          left="0"
-          gap="4"
-          bg="white"
-          p="4"
-          justify="space-between"
-          borderTop="1px solid"
-          borderColor="gray.200"
-          zIndex="10"
-        >
-          <Button colorScheme="blue" onClick={handleSubmit}>✅ Save & Continue</Button>
-          <Button variant="outline" onClick={handleSaveOnly}>💾 Save & Close</Button>
-        </Flex>
       </VStack>
+      <PageFooter
+        onSaveClose={handleSaveOnly}
+        onSaveContinue={handleSubmit}
+      />
     </Box>
   );
 };

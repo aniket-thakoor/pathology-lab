@@ -21,7 +21,6 @@
     "dexie-export-import": "^4.1.4",
     "framer-motion": "^12.23.3",
     "idb": "^8.0.3",
-    "jspdf": "^3.0.1",
     "pdfmake": "^0.2.20",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
