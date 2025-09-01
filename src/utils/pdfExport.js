@@ -21,12 +21,12 @@ pdfMake.fonts = {
 const styles = {
   labTitle: { fontSize: 20, bold: true, color: '#333', margin: [0, 0, 0, 4] },
   labSub: { fontSize: 11, italics: true, color: '#555', margin: [0, 0, 0, 6] },
-  sectionTitle: { fontSize: 13, bold: true, margin: [0, 8, 0, 4], color: '#000' },
+  sectionTitle: { fontSize: 13, bold: true, margin: [0, 8, 0, 4], color: '#222' },
   bodyLabel: { fontSize: 9, bold: true },
-  bodyValue: { fontSize: 9, color: '#000' },
-  abnormalValue: { fontSize: 9, bold: true, color: '#000' },
+  bodyValue: { fontSize: 9, color: '#222' },
+  abnormalValue: { fontSize: 9, bold: true, color: '#222' },
   noteText: { fontSize: 8, italics: true, color: '#555' },
-  tableHeader: { fontSize: 10, bold: true, color: '#000' }
+  tableHeader: { fontSize: 10, bold: true, color: '#222' }
 };
 
 /**
@@ -57,8 +57,8 @@ const boxedSection = (leftStack, rightStack) => ({
   layout: {
     hLineWidth: () => 0.5,
     vLineWidth: () => 0.5,
-    hLineColor: () => '#000',
-    vLineColor: () => '#000'
+    hLineColor: () => '#222',
+    vLineColor: () => '#222'
   },
   margin: [0, 5, 0, 10]
 });
@@ -104,8 +104,13 @@ const labHeader = (patient, labDetails) => ([
             ? 'Ms. '
             : ''}${patient.name || ''}`
       ),
-      labelVal('Age: ', patient.age),
-      labelVal('Gender: ', patient.gender),
+      {
+        columns: [
+          { width: 'auto', ...labelVal('Age: ', patient.age) },
+          { width: 'auto', ...labelVal('Gender: ', patient.gender, { alignment: 'right' }) }
+        ],
+        columnGap: 15
+      },
       patient.mobile && labelVal('Mobile: ', patient.mobile)
     ],
     [
@@ -122,38 +127,50 @@ const labHeader = (patient, labDetails) => ([
 /**
  * Footer Builder
  */
-const footer = (labDetails) => ({
+const footer = (labDetails, currentPage, pageCount) => ({
   margin: [40, 0, 40, 40],
-  table: {
-    widths: ['50%', '50%'],
-    body: [
-      [
-        {
-          stack: [
-            { text: 'Please Correlate Clinically.', style: 'bodyValue', margin: [0, 6, 0, 0] },
-            { text: '', margin: [0, 20, 0, 20] },
-            { text: 'Technologist', bold: true, color: '#000' }
-          ],
-          border: [false, false, false, false],
-          alignment: 'left'
-        },
-        {
-          stack: [
-            labDetails.signature
-              ? { image: labDetails.signature, width: 60, alignment: 'right', margin: [0, 0, 0, 4] }
-              : { text: '' },
-            { text: labDetails.doctorName || '', bold: true, alignment: 'right', color: '#000' },
-            { text: labDetails.doctorQualification || '', alignment: 'right', fontSize: 8 }
-          ],
-          border: [false, false, false, false],
-          alignment: 'right'
-        }
-      ]
-    ]
-  },
-  layout: 'noBorders'
+  stack: [
+    {
+      table: {
+        widths: ['50%', '50%'],
+        body: [
+          [
+            {
+              stack: [
+                currentPage === pageCount
+                  ? { text: 'Please Correlate Clinically.', style: 'bodyValue', margin: [0, 6, 0, 0] }
+                  : { text: '', margin: [0, 20, 0, 0] },
+                { text: '', margin: [0, 20, 0, 20] },
+                { text: 'Technologist', bold: true, color: '#222' }
+              ].filter(Boolean),
+              border: [false, false, false, false],
+              alignment: 'left'
+            },
+            {
+              stack: [
+                labDetails.signature
+                  ? { image: labDetails.signature, width: 60, alignment: 'right', margin: [0, 0, 0, 4] }
+                  : { text: '' },
+                { text: labDetails.doctorName || '', bold: true, alignment: 'right', color: '#222' },
+                { text: labDetails.doctorQualification || '', alignment: 'right', fontSize: 8 }
+              ],
+              border: [false, false, false, false],
+              alignment: 'right'
+            }
+          ]
+        ]
+      },
+      layout: 'noBorders'
+    },
+    {
+      text: `Page ${currentPage} of ${pageCount}`,
+      alignment: 'right',
+      fontSize: 8,
+      color: '#555',
+      margin: [0, 6, 0, 0]
+    }
+  ]
 });
-
 
 /**
  * Pure builder: returns the docDefinition without downloading or sharing
@@ -161,10 +178,13 @@ const footer = (labDetails) => ({
 export function getSummaryReportDocDef({ patient, labDetails, groups, results, showRanges, showNotes }) {
   const content = [];
   
-  groups.forEach((group, idx) => {
-    if (idx > 0) content.push({ text: '', pageBreak: 'before' });
-    content.push(...labHeader(patient, labDetails));
-    content.push({ text: group.classification ? group.classification : group.name, alignment: 'center', style: 'sectionTitle' });
+  const groupBlocks = [];
+
+  groups.forEach((group, index) => {
+    const groupContent = [];
+
+    groupContent.push({ text: group.classification || group.name, alignment: 'center', style: 'sectionTitle' });
+
     const headers = [
       { text: 'TEST DESCRIPTION', style: 'tableHeader', decoration: 'underline' },
       { text: 'OBSERVED VALUE', style: 'tableHeader', alignment: 'center', decoration: 'underline' },
@@ -172,14 +192,17 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
     ];
 
     const rows = [];
+
     group.subGroups.forEach(sub => {
       const subRows = [];
 
       sub.parameters.forEach(param => {
         const val = results[param.id];
-        if (!val) return; // skip empty values
+        if (!val) return;
 
-        const rangeText = Object.entries(param.ranges || {}).map(([_, r]) => `${r.min}–${r.max}`).join(' | ');
+        const { min, max } = param.ranges?.[patient.gender] || param.ranges?.Common || {};  
+        const rangeText = `${min ?? ''}–${max ?? ''}`;
+
         const abnormal = (() => {
           const r = param.ranges?.[patient.gender] || param.ranges?.Common;
           return r && !isNaN(parseFloat(val)) && (val < r.min || val > r.max);
@@ -187,7 +210,7 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
 
         const row = [
           { text: param.name, style: 'bodyValue' },
-          { text: val, style: abnormal ? 'abnormalValue' : 'bodyValue', alignment: group.hasRanges ? 'center' : 'left' }
+          { text: val, style: abnormal ? 'abnormalValue' : 'bodyValue', alignment: group.hasRanges ? 'center' : 'left', decoration: abnormal ? 'underline' : '' }
         ];
         if (group.hasRanges) {
           row.push({
@@ -210,49 +233,62 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
       }
     });
 
-
-    content.push(buildTable(headers, rows, group.hasRanges ? ['33.34%', '33.33%', '33.33%'] : ['*', 'auto']));
+    groupContent.push(buildTable(headers, rows, group.hasRanges ? ['33.34%', '33.33%', '33.33%'] : ['*', 'auto']));
 
     if (group.desc) {
-      content.push({
-        table: {
-          widths: ['*'],
-          body: [[
-            {
-              text: [
-                { text: 'Interpretation & Remark:', bold: true, fontSize: 10 },
-                { text: '\n' + group.desc, fontSize: 9 }
-              ],
-              color: '#000'
-            }
-          ]]
-        },
-        layout: {
-          hLineWidth: i => i === 0 ? 0.5 : 0,
-          hLineColor: () => 'white',
-          vLineWidth: () => 0
-        },
-        margin: [0, 16, 0, 0]
+      groupContent.push({
+        stack: [
+          { text: 'Interpretation & Remark:', bold: true, fontSize: 10, margin: [0, 16, 0, 4] },
+          { text: group.desc, fontSize: 9 }
+        ],
+        keepTogether: true
+      });
+
+      // Add page break before next group (optional)
+      if (index < groups.length - 1) {
+        groupContent.push({ text: '', pageBreak: 'after' });
+      }
+    }
+
+    groupBlocks.push({ keepTogether: true, stack: groupContent });
+
+    // Add vertical gap between groups (except after the last one)
+    if (index < groups.length - 1) {
+      groupBlocks.push({
+        text: '',
+        margin: [0, 20, 0, 0] // 20pt vertical space — adjust as needed
       });
     }
 
-    content.push({
-      text: '-- End of Report --',
-      style: 'bodyValue',
-      alignment: 'center',
-      bold: true,
-      margin: [0, 20, 0, 0]
-    });
   });
+
+  if (groupBlocks.length > 0) {
+    groupBlocks.push({
+      stack: [
+        {
+          text: '-- End of Report --',
+          style: 'bodyValue',
+          alignment: 'center',
+          bold: true,
+          margin: [0, 20, 0, 4]
+        }
+      ]
+    });
+  }
 
   return {
     pageSize: 'A4',
-    pageMargins: [20, 20, 20, 100],
-    content,
+    pageMargins: [20, 150, 20, 100], // top margin increased to accommodate header
+    content: groupBlocks,
     styles,
     defaultStyle: { font: 'PathLabFont', fontSize: 10 },
-    footer: () => footer(labDetails)
+    header: () => ({
+      margin: [20, 20, 20, 0],
+      stack: labHeader(patient, labDetails)
+    }),
+    footer: (currentPage, pageCount) => footer(labDetails, currentPage, pageCount)
   };
+
 }
 
 /**
