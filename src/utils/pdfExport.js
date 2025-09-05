@@ -172,6 +172,15 @@ const footer = (labDetails, currentPage, pageCount) => ({
   ]
 });
 
+const shouldIsolateGroup = (group, results) => {
+  const paramCount = group.subGroups?.reduce((acc, sub) => {
+    const validParams = sub.parameters.filter(param => !!results[param.id]);
+    return acc + validParams.length;
+  }, 0) || 0;
+
+  return paramCount >= 10 || !!group.desc?.trim();
+};
+
 /**
  * Pure builder: returns the docDefinition without downloading or sharing
  */
@@ -192,6 +201,7 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
     ];
 
     const rows = [];
+    let paramCount = 0;
 
     group.subGroups.forEach(sub => {
       const subRows = [];
@@ -199,6 +209,8 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
       sub.parameters.forEach(param => {
         const val = results[param.id];
         if (!val) return;
+
+        paramCount++;
 
         const { min, max } = param.ranges?.[patient.gender] || param.ranges?.Common || {};  
         const rangeText = `${min ?? ''}–${max ?? ''}`;
@@ -243,23 +255,46 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
         ],
         keepTogether: true
       });
-
-      // Add page break before next group (optional)
-      if (index < groups.length - 1) {
-        groupContent.push({ text: '', pageBreak: 'after' });
-      }
     }
 
-    groupBlocks.push({ keepTogether: true, stack: groupContent });
+    const isolate = shouldIsolateGroup(group, results);
+    const isFirstGroup = index === 0;
+    const isLastGroup = index === groups.length - 1;
+    const nextGroup = groups[index + 1];
+    const nextIsolate = nextGroup && shouldIsolateGroup(nextGroup, results);
 
-    // Add vertical gap between groups (except after the last one)
-    if (index < groups.length - 1) {
-      groupBlocks.push({
-        text: '',
-        margin: [0, 20, 0, 0] // 20pt vertical space — adjust as needed
+    // 🔹 If next group is isolated, add End of Report before pageBreak: 'before'
+    if (nextIsolate && !isLastGroup) {
+      groupContent.push({
+        text: '-- End of Report --',
+        style: 'bodyValue',
+        alignment: 'center',
+        bold: true,
+        margin: [0, 20, 0, 4]
       });
     }
 
+    const groupBlock = {
+      keepTogether: true,
+      stack: groupContent,
+      ...(isolate && !isFirstGroup ? { pageBreak: 'before' } : {})
+    };
+
+    groupBlocks.push(groupBlock);
+
+    // 🔹 If current group is isolated and next is not, add End of Report before pageBreak: 'after'
+    if (isolate && !isLastGroup && !nextIsolate) {
+      groupBlocks.push({
+        text: '-- End of Report --',
+        style: 'bodyValue',
+        alignment: 'center',
+        bold: true,
+        margin: [0, 20, 0, 4]
+      });
+      groupBlocks.push({ text: '', pageBreak: 'after' });
+    } else if (!isLastGroup) {
+      groupBlocks.push({ text: '', margin: [0, 20, 0, 0] });
+    }
   });
 
   if (groupBlocks.length > 0) {
