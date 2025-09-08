@@ -18,19 +18,6 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "screenshots": [
-  {
-    "src": "/pathology-lab/screenshots/Screenshot2.png",
-    "sizes": "412x915",
-    "type": "image/png"
-  },
-  {
-    "src": "/pathology-lab/screenshots/Screenshot1.png",
-    "sizes": "1280x800",
-    "type": "image/png",
-    "form_factor": "wide"
-  }
-]
+  ]
 
 }
