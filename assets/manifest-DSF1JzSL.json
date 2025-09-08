@@ -3,6 +3,7 @@
   "id": "/pathology-lab/",
   "short_name": "Lab",
   "start_url": "/pathology-lab/",
+  "scope": "/pathology-lab/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2b6cb0",
@@ -20,17 +21,16 @@
     }
   ],
   "screenshots": [
-  {
-    "src": "/pathology-lab/screenshots/mobile-home.png",
-    "sizes": "412x915",
-    "type": "image/png"
-  },
-  {
-    "src": "/pathology-lab/screenshots/desktop-home.png",
-    "sizes": "1280x800",
-    "type": "image/png",
-    "form_factor": "wide"
-  }
-]
-
+    {
+      "src": "/pathology-lab/screenshots/mobile-home.png",
+      "sizes": "412x915",
+      "type": "image/png"
+    },
+    {
+      "src": "/pathology-lab/screenshots/desktop-home.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
 }
