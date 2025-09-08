@@ -1,5 +1,6 @@
 {
   "name": "Pathology Lab",
+  "id": "/pathology-lab/",
   "short_name": "Lab",
   "start_url": ".",
   "display": "standalone",
