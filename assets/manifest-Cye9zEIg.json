@@ -2,7 +2,7 @@
   "name": "Pathology Lab",
   "id": "/pathology-lab/",
   "short_name": "Lab",
-  "start_url": ".",
+  "start_url": "/pathology-lab/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2b6cb0",
