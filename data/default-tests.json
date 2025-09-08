@@ -1,0 +1,1134 @@
+[
+  {
+    "id": "1756221261951",
+    "name": "CBC (Complete Blood Count)",
+    "desc": "",
+    "hasRanges": true,
+    "subGroups": [
+      {
+        "id": "1756221289705",
+        "name": "RBC PARAMETERS",
+        "parameters": [
+          {
+            "id": "1756221419578",
+            "name": "Haemoglobin",
+            "unit": "gm/dL",
+            "ranges": {
+              "Common": {
+                "min": 12,
+                "max": 15.6,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756221454378",
+            "name": "RBC",
+            "unit": "L",
+            "ranges": {
+              "Common": {
+                "min": 3.9,
+                "max": 5.2,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756221498597",
+            "name": "PCV",
+            "unit": "%",
+            "ranges": {
+              "Common": {
+                "min": 35.5,
+                "max": 45.5,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756221549445",
+            "name": "MCV",
+            "unit": "fL",
+            "ranges": {
+              "Common": {
+                "min": 80,
+                "max": 99,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756221583636",
+            "name": "MCH",
+            "unit": "pg",
+            "ranges": {
+              "Common": {
+                "min": 27,
+                "max": 33.5,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756221629126",
+            "name": "MCHC",
+            "unit": "g/dl",
+            "ranges": {
+              "Common": {
+                "min": 31.5,
+                "max": 36,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756221655867",
+            "name": "RDW",
+            "unit": "%",
+            "ranges": {
+              "Common": {
+                "min": 11.5,
+                "max": 15,
+                "note": ""
+              }
+            },
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "1756221760006",
+        "name": "WBC PARAMETERS",
+        "parameters": [
+          {
+            "id": "1756221795456",
+            "name": "Total WBC Count",
+            "unit": "/C .mm",
+            "ranges": {
+              "Common": {
+                "min": 3900,
+                "max": 10200,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756221823917",
+            "name": "Neutrophils",
+            "unit": "%",
+            "ranges": {
+              "Common": {
+                "min": 42,
+                "max": 77,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756221859381",
+            "name": "Lymphocytes",
+            "unit": "%",
+            "ranges": {
+              "Common": {
+                "min": 20,
+                "max": 44,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756221881431",
+            "name": "Eosinophils",
+            "unit": "%",
+            "ranges": {
+              "Common": {
+                "min": 0.5,
+                "max": 5.5,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756221903961",
+            "name": "Monocytes",
+            "unit": "%",
+            "ranges": {
+              "Common": {
+                "min": 2,
+                "max": 9.5,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756221930028",
+            "name": "Basophils",
+            "unit": "%",
+            "ranges": {
+              "Common": {
+                "min": 0,
+                "max": 1.75,
+                "note": ""
+              }
+            },
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "1756221976375",
+        "name": "PLATELET PARAMETERS",
+        "parameters": [
+          {
+            "id": "1756222007128",
+            "name": "Platelet Count",
+            "unit": "/cmm",
+            "ranges": {
+              "Common": {
+                "min": 150000,
+                "max": 450000,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756222038351",
+            "name": "MPV",
+            "unit": "fL",
+            "ranges": {
+              "Common": {
+                "min": 5.9,
+                "max": 9.9,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756222066584",
+            "name": "PCT",
+            "unit": "%",
+            "ranges": {
+              "Common": {
+                "min": 0.15,
+                "max": 0.62,
+                "note": ""
+              }
+            },
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "1756222081025",
+        "name": "PERIPHERIAL SMEAR FINDINGS",
+        "parameters": [
+          {
+            "id": "1756222120484",
+            "name": "RBC MORPHOLOGY",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756222134314",
+            "name": "WBC MORPHOLOGY",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756222142189",
+            "name": "PLATELET MORPHOLOGY",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          }
+        ]
+      }
+    ],
+    "classification": ""
+  },
+  {
+    "id": "1756231810494",
+    "name": "Blood Sugar",
+    "desc": "",
+    "hasRanges": true,
+    "classification": "BIOCHEMISTRY",
+    "subGroups": [
+      {
+        "id": "1756231836692",
+        "name": "Blood Sugar",
+        "parameters": [
+          {
+            "id": "1756231936626",
+            "name": "(Fasting)",
+            "unit": "mg/dl",
+            "ranges": {
+              "Common": {
+                "min": 70,
+                "max": 110,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756232843317",
+            "name": "Urine Glucose",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756232856181",
+            "name": "Ketone Bodies",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "1756232601258",
+        "name": "Blood Sugar",
+        "parameters": [
+          {
+            "id": "1756232738455",
+            "name": "(2 Hours After Food)",
+            "unit": "mg/dl",
+            "ranges": {
+              "Common": {
+                "min": 70,
+                "max": 130,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756232875062",
+            "name": "Urine Glucose",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756232886144",
+            "name": "Ketone Bodies",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "1756232757050",
+        "name": "Blood Sugar",
+        "parameters": [
+          {
+            "id": "1756232809811",
+            "name": "(Random)",
+            "unit": "mg/dl",
+            "ranges": {
+              "Common": {
+                "min": 70,
+                "max": 130,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756232904812",
+            "name": "Urine Glucose",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756232914472",
+            "name": "Ketone Bodies",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1756301228643",
+    "name": "Widal Agglutination Test",
+    "desc": "(Side Agglutination Method)\n- This test becomes positive after 7 days.\n- A negative result before this period is inconclusive.\n- A rising titre is highly significant after repetition.\n- A poor agglutination may be seen in cases treated earlier with Antibiotics.\n- Cases who had prior infection or immunisations may show positive result during an unrelated fever. ",
+    "hasRanges": false,
+    "classification": "",
+    "subGroups": [
+      {
+        "id": "1756301245007",
+        "name": "WIDAL TEST",
+        "parameters": [
+          {
+            "id": "1756301291062",
+            "name": "Agglutination in S. typhi 'O' -",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756301356208",
+            "name": "Agglutination in S. typhi 'H' -",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756301395219",
+            "name": "Agglutination in S. paratyphi 'A' (H) -",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756301427211",
+            "name": "Agglutination in S. paratyphi 'B' (H) -",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1756302395615",
+    "name": "Stool Routine",
+    "desc": "",
+    "hasRanges": false,
+    "classification": "Faeces Examination",
+    "subGroups": [
+      {
+        "id": "1756302408410",
+        "name": "Physical Examination",
+        "parameters": [
+          {
+            "id": "1756302434794",
+            "name": "Colour",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302445942",
+            "name": "Mucus",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302456902",
+            "name": "Parasites",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302575914",
+            "name": "Reaction",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302592780",
+            "name": "Consistency",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302615231",
+            "name": "Blood",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302622329",
+            "name": "Odour",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "1756302697865",
+        "name": "Chemical Examination",
+        "parameters": [
+          {
+            "id": "1756302709681",
+            "name": "Occult Blood",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "1756302730601",
+        "name": "Microscopic Examination",
+        "parameters": [
+          {
+            "id": "1756302745557",
+            "name": "Red Blood Cells",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302756657",
+            "name": "Macrophages",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302773815",
+            "name": "Fat globules",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302792013",
+            "name": "Ova / Egg",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302799833",
+            "name": "Cysts",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302809043",
+            "name": "Pus Cells",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302839260",
+            "name": "Epithelial Cells",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302850254",
+            "name": "Undigested Material",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302861656",
+            "name": "Vegetative Forms",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756302868171",
+            "name": "Larvae",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1756303231829",
+    "name": "Urine Routine",
+    "desc": "",
+    "hasRanges": false,
+    "classification": "Examination Of Urine",
+    "subGroups": [
+      {
+        "id": "1756303259240",
+        "name": "Physical Examination",
+        "parameters": [
+          {
+            "id": "1756303282029",
+            "name": "Volume",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303335522",
+            "name": "Colour",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303346642",
+            "name": "Transparency",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303353635",
+            "name": "Deposit",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303360852",
+            "name": "Reaction",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303369153",
+            "name": "Specific gravity",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "1756303395096",
+        "name": "Chemical Examination",
+        "parameters": [
+          {
+            "id": "1756303408783",
+            "name": "Albumin",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303421998",
+            "name": "Sugar",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303439738",
+            "name": "Acetone",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303447004",
+            "name": "Bile pigments",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303455703",
+            "name": "Bile Salts",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303461608",
+            "name": "Blood",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "1756303515083",
+        "name": "Microscopic Examination (200 rpm, 10 mins, 4mm objective)",
+        "parameters": [
+          {
+            "id": "1756303542500",
+            "name": "Erythrocytes",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303550537",
+            "name": "Pus Cells",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303564936",
+            "name": "Epithelial Cells",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303575516",
+            "name": "Crystals",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303618229",
+            "name": "Casts",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303660025",
+            "name": "Yeast Cells",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303689037",
+            "name": "Amorphous Material",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1756303864669",
+    "name": "HIV",
+    "desc": "This is a screening test. Positive test is not diagnostic of Aids and should be confirmed by western blot method.\nNegative test does not exclude possibility of exposure to or infection with HIV virus.",
+    "hasRanges": false,
+    "classification": "Examination Of Blood",
+    "subGroups": [
+      {
+        "id": "1756303922415",
+        "name": "HIV (Method: TRIDOT, Sample: Serum)",
+        "parameters": [
+          {
+            "id": "1756303936195",
+            "name": "HIV I",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303943744",
+            "name": "HIV II",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756303950625",
+            "name": "RESULT",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1756304547861",
+    "name": "Lipid Profiles",
+    "desc": "",
+    "hasRanges": true,
+    "classification": "",
+    "subGroups": [
+      {
+        "id": "1756304563965",
+        "name": "LIPID PROFILES",
+        "parameters": [
+          {
+            "id": "1756304603408",
+            "name": "S. Cholesterol",
+            "unit": "mg%",
+            "ranges": {
+              "Common": {
+                "min": 150,
+                "max": 200,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756304649916",
+            "name": "S. HDL Cholesterol",
+            "unit": "mg%",
+            "ranges": {
+              "Common": {
+                "min": 28,
+                "max": 66,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756304714574",
+            "name": "Chol/HDL ratio",
+            "unit": "",
+            "ranges": {
+              "Common": {
+                "min": 1,
+                "max": 4.4,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756305064992",
+            "name": "S. Triglycerides",
+            "unit": "mg%",
+            "ranges": {
+              "Male": {
+                "min": 60,
+                "max": 165,
+                "note": ""
+              },
+              "Female": {
+                "min": 40,
+                "max": 140,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756305253744",
+            "name": "LDL Cholesterol",
+            "unit": "mg%",
+            "ranges": {
+              "Common": {
+                "min": 66,
+                "max": 178,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756305297043",
+            "name": "VLDL Cholesterol",
+            "unit": "mg%",
+            "ranges": {
+              "Common": {
+                "min": 2,
+                "max": 38,
+                "note": ""
+              }
+            },
+            "note": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1756305360778",
+    "name": "Kidney Function Test",
+    "desc": "",
+    "hasRanges": true,
+    "classification": "",
+    "subGroups": [
+      {
+        "id": "1756305391729",
+        "name": " ",
+        "parameters": [
+          {
+            "id": "1756305426620",
+            "name": "S. Urea",
+            "unit": "mg%",
+            "ranges": {
+              "Common": {
+                "min": 14,
+                "max": 40,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756305466778",
+            "name": "S. Urea-Nitrogen",
+            "unit": "mg%",
+            "ranges": {
+              "Common": {
+                "min": 10,
+                "max": 20,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756305507388",
+            "name": "S. NPN",
+            "unit": "mg%",
+            "ranges": {
+              "Common": {
+                "min": 25,
+                "max": 35,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756305547151",
+            "name": "S. Creatinine",
+            "unit": "mg%",
+            "ranges": {
+              "Male": {
+                "min": 0.6,
+                "max": 1.2,
+                "note": ""
+              },
+              "Female": {
+                "min": 0.5,
+                "max": 1.1,
+                "note": ""
+              }
+            },
+            "note": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1756305605660",
+    "name": "Liver Function Test",
+    "desc": "",
+    "hasRanges": true,
+    "classification": "",
+    "subGroups": [
+      {
+        "id": "1756305621522",
+        "name": " ",
+        "parameters": [
+          {
+            "id": "1756305665784",
+            "name": "S. Bilirubin Total",
+            "unit": "mg%",
+            "ranges": {
+              "Common": {
+                "min": 0.2,
+                "max": 1,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756305699910",
+            "name": "S. Bilirubin Direct",
+            "unit": "mg%",
+            "ranges": {
+              "Common": {
+                "min": 0,
+                "max": 0.2,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756305824839",
+            "name": "S. Bilirubin Indirect",
+            "unit": "",
+            "ranges": {},
+            "note": ""
+          },
+          {
+            "id": "1756305869551",
+            "name": "SGOT",
+            "unit": "Units/ml",
+            "ranges": {
+              "Common": {
+                "min": 8,
+                "max": 40,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756305952884",
+            "name": "SGPT",
+            "unit": "Units/ml",
+            "ranges": {
+              "Common": {
+                "min": 5,
+                "max": 35,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756306027039",
+            "name": "S. Alk Phosphatase",
+            "unit": "IU/L",
+            "ranges": {
+              "Common": {
+                "min": 44,
+                "max": 147,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756306231756",
+            "name": "S. Proteins Total",
+            "unit": "gldl",
+            "ranges": {
+              "Common": {
+                "min": 6,
+                "max": 8,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756306271806",
+            "name": "S. Albumin",
+            "unit": "gldl",
+            "ranges": {
+              "Common": {
+                "min": 3.7,
+                "max": 5.3,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756306308342",
+            "name": "S. Globulin",
+            "unit": "gldl",
+            "ranges": {
+              "Common": {
+                "min": 2.3,
+                "max": 3.6,
+                "note": ""
+              }
+            },
+            "note": ""
+          },
+          {
+            "id": "1756306336972",
+            "name": "Alb/Glob Ratio",
+            "unit": "",
+            "ranges": {
+              "Common": {
+                "min": 1,
+                "max": 2.3,
+                "note": ""
+              }
+            },
+            "note": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1756306405327",
+    "name": "Uric Acid",
+    "desc": "",
+    "hasRanges": true,
+    "classification": "BIOCHEMISTRY",
+    "subGroups": [
+      {
+        "id": "1756306416089",
+        "name": " ",
+        "parameters": [
+          {
+            "id": "1756306474410",
+            "name": "S. Uric Acid",
+            "unit": "mg/dl",
+            "ranges": {
+              "Male": {
+                "min": 3.4,
+                "max": 7,
+                "note": ""
+              },
+              "Female": {
+                "min": 2.4,
+                "max": 6,
+                "note": ""
+              }
+            },
+            "note": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1756306545501",
+    "name": "Calcium",
+    "desc": "",
+    "hasRanges": true,
+    "classification": "BIOCHEMISTRY",
+    "subGroups": [
+      {
+        "id": "1756306551820",
+        "name": " ",
+        "parameters": [
+          {
+            "id": "1756306578133",
+            "name": "S. Calcium",
+            "unit": "mg/dl",
+            "ranges": {
+              "Common": {
+                "min": 8.7,
+                "max": 11,
+                "note": ""
+              }
+            },
+            "note": ""
+          }
+        ]
+      }
+    ]
+  }
+]
