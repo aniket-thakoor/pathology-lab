@@ -119,8 +119,9 @@ const PatientEntry = () => {
   };
 
   const handleSaveOnly = () => {
-    if (!form.name || !form.mobile) {
-      toast({ title: 'Enter at least name & mobile to save.', status: 'warning' });
+    const { name, gender, age, mobile, referredBy } = form;
+    if (!name || !gender || !age) {
+      toast({ title: 'Please fill all required fields.', status: 'warning' });
       return;
     }
     savePatient('pending', false);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { ChakraProvider } from '@chakra-ui/react';
 
 import Home from './components/pages/Home';
@@ -18,7 +18,6 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/assets" element={<Home />} />
           <Route path="/patients" element={<RecentPatients />} />
           <Route path="/patient" element={<PatientEntry />} />
           <Route path="/select-tests" element={<SelectTestGroups />} />
