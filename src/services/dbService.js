@@ -87,6 +87,12 @@ export const getSelectedTests = async (patientId) => {
   return record?.tests || [];
 };
 
+// Get All selected tests
+export const getAllSelectedTests = async () => {
+  const db = await getDB();
+  return await db.getAll('selectedTests');
+};
+
 // Save or Replace Test Results
 export const putTestResults = async (patientId, results) => {
   const db = await getDB();

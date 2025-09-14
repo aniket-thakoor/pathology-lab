@@ -55,7 +55,7 @@ const TestMaster = () => {
 
   const handleLoadDefaults = async () => {
     try {
-      const res = await fetch('/data/default-tests.json');
+      const res = await fetch('/pathology-lab/data/default-tests.json');
       const defaultTests = await res.json();
       await putTestGroups(defaultTests);
       setGroups(defaultTests);

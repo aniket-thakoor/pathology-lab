@@ -1,35 +1,36 @@
 {
   "name": "Pathology Lab",
+  "id": "/pathology-lab/",
   "short_name": "Lab",
-  "start_url": ".",
+  "start_url": "/pathology-lab/",
+  "scope": "/pathology-lab/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2b6cb0",
   "description": "Audit-safe clinical & pathology reporting",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
+      "src": "/pathology-lab/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-512.png",
+      "src": "/pathology-lab/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ],
   "screenshots": [
-  {
-    "src": "screenshots/mobile-home.png",
-    "sizes": "412x915",
-    "type": "image/png"
-  },
-  {
-    "src": "screenshots/desktop-home.png",
-    "sizes": "1280x800",
-    "type": "image/png",
-    "form_factor": "wide"
-  }
-]
-
+    {
+      "src": "/pathology-lab/screenshots/mobile-home.png",
+      "sizes": "412x915",
+      "type": "image/png"
+    },
+    {
+      "src": "/pathology-lab/screenshots/desktop-home.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
 }

@@ -168,8 +168,23 @@ const footer = (labDetails, currentPage, pageCount) => ({
       fontSize: 8,
       color: '#555',
       margin: [0, 6, 0, 0]
+    },
+    currentPage === pageCount && {
+      text: [
+        'This report was digitally generated using app ',
+        {
+          text: 'pathology-lab',
+          link: 'https://github.com/aniket-thakoor/pathology-lab',
+          color: '#2a5db0',
+          decoration: 'underline'
+        }
+      ],
+      fontSize: 7,
+      color: '#777',
+      alignment: 'left',
+      margin: [0, 4, 0, 0]
     }
-  ]
+  ].filter(Boolean)
 });
 
 const shouldIsolateGroup = (group, results) => {
@@ -313,7 +328,7 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
 
   return {
     pageSize: 'A4',
-    pageMargins: [20, 150, 20, 100], // top margin increased to accommodate header
+    pageMargins: [20, 150, 20, 105], // top margin increased to accommodate header
     content: groupBlocks,
     styles,
     defaultStyle: { font: 'PathLabFont', fontSize: 10 },

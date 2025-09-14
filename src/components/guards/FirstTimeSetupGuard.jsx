@@ -44,7 +44,7 @@ export default function FirstTimeSetupGuard({ children }) {
       const file = await fileHandle.getFile();
       await restoreFromFile(file, 'merge'); // or 'replace'
       alert(`✅ Restore Completed. ${file.name} has been imported.`);
-      window.location.href = '/';
+      window.location.href = '/pathology-lab/';
     } catch (err) {
       console.error(err);
       toast({

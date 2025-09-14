@@ -3,28 +3,36 @@ import {
   Box, Heading, Text, Grid, GridItem, Button, Flex
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { getLabDetails, getAllPatients } from '@/services/dbService';
+import { getLabDetails, getAllPatients, getAllSelectedTests } from '@/services/dbService';
 import FirstTimeSetupGuard from '../guards/FirstTimeSetupGuard';
 
 const Home = () => {
   const navigate = useNavigate();
   const [labDetails, setLabDetails] = useState({});
   const [patients, setPatients] = useState({});
+  const [allSelectedTests, setAllSelectedTests] = useState([]);
 
   useEffect(() => {
-      Promise.all([
-        getLabDetails(),
-        getAllPatients()
-      ]).then(([lab, pat]) => {
-        setLabDetails(lab || {});
-        setPatients(pat || {});
-      });
-    }, []);
+    Promise.all([
+      getLabDetails(),
+      getAllPatients(),
+      getAllSelectedTests()
+    ]).then(([lab, pat, selTests]) => {
+      setLabDetails(lab || {});
+      setPatients(pat || {});
+      setAllSelectedTests(selTests || []);
+    });
+  }, []);
 
+  const totalTests = allSelectedTests.reduce?.((sum, entry) => {
+    return sum + (entry.tests?.length || 0);
+  }, 0) || 0;
+
+  const todayDate = new Date().toISOString().split('T')[0];
   const quickStats = {
-    patientsToday: 12,
+    patientsToday: patients.filter?.(p => p.sampleDate === todayDate).length || 0,
     pendingResults: patients.filter ? patients.filter(p => p.status === 'pending').length : 0,
-    totalTests: 38,
+    totalTests,
     totalPatients: patients.length
   };
 
