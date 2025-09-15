@@ -1,6 +1,17 @@
 # 🧪 Clinical-Grade Pathology Lab App 
 ### *"From patient intake to audit-safe PDF — all in one offline-first PWA."*
 
+## 🚀 Live Demo
+Try the app here: **[Pathology Lab on GitHub Pages](https://aniket-thakoor.github.io/pathology-lab/)**  
+Works on desktop & mobile — installable as a PWA for offline use.
+
+
+<img width="426" height="930" alt="Screenshot 2025-09-15 110953" src="https://github.com/user-attachments/assets/183d88ab-5512-4080-b136-cef465ded024" />
+<img width="426" height="930" alt="Screenshot 2025-09-15 110549" src="https://github.com/user-attachments/assets/321e2311-3af0-44f4-b4ea-0d167470ac51" />
+<img width="417" height="925" alt="Screenshot 2025-09-15 111048" src="https://github.com/user-attachments/assets/77fd6b02-c8ce-4bd9-8c87-36fa462a6822" />
+<img width="422" height="925" alt="Screenshot 2025-09-15 112451" src="https://github.com/user-attachments/assets/b8dcd9f4-1b23-417a-83cf-c8635bd6b052" />
+<img width="681" height="963" alt="Screenshot 2025-09-15 111339" src="https://github.com/user-attachments/assets/3b6e7d34-229e-4861-a94b-494d2e68bb58" />
+
 ## 📚 Table of Contents
 - [Overview](#-overview)
 - [Key Highlights](#key-highlights)
