@@ -1,7 +1,7 @@
 {
   "name": "Pathology Lab",
   "id": "/pathology-lab/",
-  "short_name": "Lab",
+  "short_name": "Path Lab",
   "start_url": "/pathology-lab/",
   "scope": "/pathology-lab/",
   "display": "standalone",
