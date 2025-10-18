@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Heading, Input, Textarea, Button,
-  FormControl, FormLabel, VStack
+  FormControl, FormLabel, VStack, Switch
 } from '@chakra-ui/react';
 import { getLabDetails, putLabDetails } from '@/services/dbService';
 import SignatureField from '../common/SignatureField';
@@ -26,6 +26,9 @@ const LabDetails = () => {
     signature: ''
   });
   const navigate = useNavigate();
+  const [showAppDetails, setShowAppDetails] = useState(() => {
+  return localStorage.getItem('showAppDetailsInReport') === 'true';
+});
 
   useEffect(() => {
     getLabDetails().then((stored) => {
@@ -50,6 +53,7 @@ const LabDetails = () => {
     }
 
     await putLabDetails(details);
+    localStorage.setItem('showAppDetailsInReport', String(showAppDetails));
     alert('✅ Lab details saved!');
     navigate('/');
   };
@@ -117,6 +121,18 @@ const LabDetails = () => {
         <FormControl>
           <FormLabel>📥 Import from JSON</FormLabel>
           <Input type="file" accept=".json" onChange={handleImport} />
+        </FormControl>
+
+        <FormControl display="flex" alignItems="center">
+          <FormLabel htmlFor="showAppDetails" mb="0">
+            Show App Details in the Report?
+          </FormLabel>
+          <Switch
+            id="showAppDetails"
+            isChecked={showAppDetails}
+            onChange={(e) => setShowAppDetails(e.target.checked)}
+            colorScheme="blue"
+          />
         </FormControl>
 
       </VStack>

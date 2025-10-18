@@ -19,14 +19,14 @@ pdfMake.fonts = {
  * Common styles
  */
 const styles = {
-  labTitle: { fontSize: 20, bold: true, color: '#333', margin: [0, 0, 0, 4] },
+  labTitle: { fontSize: 21, bold: true, color: '#333', margin: [0, 0, 0, 4] },
   labSub: { fontSize: 11, italics: true, color: '#555', margin: [0, 0, 0, 6] },
-  sectionTitle: { fontSize: 13, bold: true, margin: [0, 8, 0, 4], color: '#222' },
+  sectionTitle: { fontSize: 15, bold: true, margin: [0, 22, 0, 4], color: '#222' },
   bodyLabel: { fontSize: 9, bold: true },
-  bodyValue: { fontSize: 9, color: '#222' },
-  abnormalValue: { fontSize: 9, bold: true, color: '#222' },
+  bodyValue: { fontSize: 11, color: '#222' },
+  abnormalValue: { fontSize: 11, bold: true, color: '#222' },
   noteText: { fontSize: 8, italics: true, color: '#555' },
-  tableHeader: { fontSize: 10, bold: true, color: '#222' }
+  tableHeader: { fontSize: 12, bold: true, color: '#222' }
 };
 
 /**
@@ -127,65 +127,71 @@ const labHeader = (patient, labDetails) => ([
 /**
  * Footer Builder
  */
-const footer = (labDetails, currentPage, pageCount) => ({
-  margin: [40, 0, 40, 40],
-  stack: [
-    {
-      table: {
-        widths: ['50%', '50%'],
-        body: [
-          [
-            {
-              stack: [
-                currentPage === pageCount
-                  ? { text: 'Please Correlate Clinically.', style: 'bodyValue', margin: [0, 6, 0, 0] }
-                  : { text: '', margin: [0, 20, 0, 0] },
-                { text: '', margin: [0, 20, 0, 20] },
-                { text: 'Technologist', bold: true, color: '#222' }
-              ].filter(Boolean),
-              border: [false, false, false, false],
-              alignment: 'left'
-            },
-            {
-              stack: [
-                labDetails.signature
-                  ? { image: labDetails.signature, width: 60, alignment: 'right', margin: [0, 0, 0, 4] }
-                  : { text: '' },
-                { text: labDetails.doctorName || '', bold: true, alignment: 'right', color: '#222' },
-                { text: labDetails.doctorQualification || '', alignment: 'right', fontSize: 8 }
-              ],
-              border: [false, false, false, false],
-              alignment: 'right'
-            }
+const footer = (labDetails, currentPage, pageCount) => {
+  const showAppDetails = localStorage.getItem('showAppDetailsInReport') === 'true';
+
+  return {
+    margin: [40, 0, 40, 40],
+    stack: [
+      {
+        table: {
+          widths: ['50%', '50%'],
+          body: [
+            [
+              {
+                stack: [
+                  currentPage === pageCount
+                    ? { text: 'Please Correlate Clinically.', style: 'bodyValue', margin: [0, 6, 0, 0] }
+                    : { text: '', margin: [0, 20, 0, 0] },
+                  { text: '', margin: [0, 20, 0, 20] },
+                  { text: 'Technologist', bold: true, color: '#222' }
+                ].filter(Boolean),
+                border: [false, false, false, false],
+                alignment: 'left'
+              },
+              {
+                stack: [
+                  labDetails.signature
+                    ? { image: labDetails.signature, width: 60, alignment: 'right', margin: [0, 0, 0, 4] }
+                    : { text: '' },
+                  { text: labDetails.doctorName || '', bold: true, alignment: 'right', color: '#222' },
+                  { text: labDetails.doctorQualification || '', alignment: 'right', fontSize: 8 }
+                ],
+                border: [false, false, false, false],
+                alignment: 'right'
+              }
+            ]
           ]
-        ]
+        },
+        layout: 'noBorders'
       },
-      layout: 'noBorders'
-    },
-    {
-      text: `Page ${currentPage} of ${pageCount}`,
-      alignment: 'right',
-      fontSize: 8,
-      color: '#555',
-      margin: [0, 6, 0, 0]
-    },
-    currentPage === pageCount && {
-      text: [
-        'This report was digitally generated using app ',
-        {
-          text: 'pathology-lab',
-          link: 'https://github.com/aniket-thakoor/pathology-lab',
-          color: '#2a5db0',
-          decoration: 'underline'
-        }
-      ],
-      fontSize: 7,
-      color: '#777',
-      alignment: 'left',
-      margin: [0, 4, 0, 0]
-    }
-  ].filter(Boolean)
-});
+      {
+        text: `Page ${currentPage} of ${pageCount}`,
+        alignment: 'right',
+        fontSize: 8,
+        color: '#555',
+        margin: [0, 6, 0, 0]
+      },
+      ...(showAppDetails && currentPage === pageCount
+        ? [{
+            text: [
+              'This report was digitally generated using app ',
+              {
+                text: 'github.com/aniket-thakoor/pathology-lab',
+                link: 'https://github.com/aniket-thakoor/pathology-lab',
+                color: '#2a5db0',
+                decoration: 'underline'
+              }
+            ],
+            fontSize: 7,
+            color: '#777',
+            alignment: 'left',
+            margin: [0, 4, 0, 0]
+          }]
+        : [])
+    ].filter(Boolean)
+  };
+};
 
 const shouldIsolateGroup = (group, results) => {
   const paramCount = group.subGroups?.reduce((acc, sub) => {
@@ -204,7 +210,39 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
   
   const groupBlocks = [];
 
-  groups.forEach((group, index) => {
+  const classifyGroup = (group) => {
+    const paramCount = group.subGroups?.reduce((acc, sub) => {
+      const validParams = sub.parameters.filter(param => !!results[param.id]);
+      return acc + validParams.length;
+    }, 0) || 0;
+
+    return {
+      paramCount,
+      type:
+        paramCount >= 10 || !!group.desc?.trim()
+          ? 'isolated'
+          : paramCount >= 6
+          ? 'medium'
+          : 'small'
+    };
+  };
+
+  const isolatedGroups = [];
+  const mediumGroups = [];
+  const smallGroups = [];
+
+  groups.forEach(group => {
+    const { type } = classifyGroup(group);
+    if (type === 'isolated') isolatedGroups.push(group);
+    else if (type === 'medium') mediumGroups.push(group);
+    else smallGroups.push(group);
+  });
+
+  const totalGroups = isolatedGroups.length + mediumGroups.length + smallGroups.length;
+  let groupCounter = 0;
+  let smallIndex = 0;
+
+  const buildGroupBlock = (group) => {
     const groupContent = [];
 
     groupContent.push({ text: group.classification || group.name, alignment: 'center', style: 'sectionTitle' });
@@ -216,7 +254,6 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
     ];
 
     const rows = [];
-    let paramCount = 0;
 
     group.subGroups.forEach(sub => {
       const subRows = [];
@@ -225,15 +262,9 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
         const val = results[param.id];
         if (!val) return;
 
-        paramCount++;
-
-        const { min, max } = param.ranges?.[patient.gender] || param.ranges?.Common || {};  
+        const { min, max } = param.ranges?.[patient.gender] || param.ranges?.Common || {};
         const rangeText = `${min ?? ''}–${max ?? ''}`;
-
-        const abnormal = (() => {
-          const r = param.ranges?.[patient.gender] || param.ranges?.Common;
-          return r && !isNaN(parseFloat(val)) && (val < r.min || val > r.max);
-        })();
+        const abnormal = param.ranges && !isNaN(parseFloat(val)) && (val < min || val > max);
 
         const row = [
           { text: param.name, style: 'bodyValue' },
@@ -253,7 +284,7 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
 
       if (subRows.length > 0) {
         rows.push([
-          { text: sub.name, colSpan: group.hasRanges ? 3 : 2, bold: true, fontSize: 9, decoration: 'underline' },
+          { text: sub.name, colSpan: group.hasRanges ? 3 : 2, bold: true, fontSize: 11, decoration: 'underline' },
           ...(group.hasRanges ? ['', ''] : [''])
         ]);
         rows.push(...subRows);
@@ -265,40 +296,24 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
     if (group.desc) {
       groupContent.push({
         stack: [
-          { text: 'Interpretation & Remark:', bold: true, fontSize: 10, margin: [0, 16, 0, 4] },
-          { text: group.desc, fontSize: 9 }
+          { text: 'Interpretation & Remark:', bold: true, fontSize: 11, margin: [0, 16, 0, 4] },
+          { text: group.desc, fontSize: 11 }
         ],
         keepTogether: true
       });
     }
 
-    const isolate = shouldIsolateGroup(group, results);
-    const isFirstGroup = index === 0;
-    const isLastGroup = index === groups.length - 1;
-    const nextGroup = groups[index + 1];
-    const nextIsolate = nextGroup && shouldIsolateGroup(nextGroup, results);
-
-    // 🔹 If next group is isolated, add End of Report before pageBreak: 'before'
-    if (nextIsolate && !isLastGroup) {
-      groupContent.push({
-        text: '-- End of Report --',
-        style: 'bodyValue',
-        alignment: 'center',
-        bold: true,
-        margin: [0, 20, 0, 4]
-      });
-    }
-
-    const groupBlock = {
+    return {
       keepTogether: true,
-      stack: groupContent,
-      ...(isolate && !isFirstGroup ? { pageBreak: 'before' } : {})
+      stack: groupContent
     };
+  };
 
-    groupBlocks.push(groupBlock);
-
-    // 🔹 If current group is isolated and next is not, add End of Report before pageBreak: 'after'
-    if (isolate && !isLastGroup && !nextIsolate) {
+  // 🔹 Add isolated groups
+  isolatedGroups.forEach(group => {
+    groupBlocks.push(buildGroupBlock(group));
+    groupCounter++;
+    if (groupCounter < totalGroups) {
       groupBlocks.push({
         text: '-- End of Report --',
         style: 'bodyValue',
@@ -307,10 +322,71 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
         margin: [0, 20, 0, 4]
       });
       groupBlocks.push({ text: '', pageBreak: 'after' });
-    } else if (!isLastGroup) {
-      groupBlocks.push({ text: '', margin: [0, 20, 0, 0] });
     }
   });
+
+  // 🔹 Add medium groups
+  for (let i = 0; i < mediumGroups.length; i++) {
+    groupBlocks.push(buildGroupBlock(mediumGroups[i]));
+    groupCounter++;
+
+    const isLastMedium = i === mediumGroups.length - 1;
+    const isOddCount = mediumGroups.length % 2 !== 0;
+
+    if ((i + 1) % 2 === 0) {
+      if (groupCounter < totalGroups) {
+        groupBlocks.push({
+        text: '-- End of Report --',
+        style: 'bodyValue',
+        alignment: 'center',
+        bold: true,
+        margin: [0, 20, 0, 4]
+      });
+        groupBlocks.push({ text: '', pageBreak: 'after' });
+      }
+    } else if (isOddCount && isLastMedium && smallGroups[smallIndex]) {
+      groupBlocks.push(buildGroupBlock(smallGroups[smallIndex]));
+      groupCounter++;
+      smallIndex++;
+      if (groupCounter < totalGroups) {
+        groupBlocks.push({
+        text: '-- End of Report --',
+        style: 'bodyValue',
+        alignment: 'center',
+        bold: true,
+        margin: [0, 20, 0, 4]
+      });
+        groupBlocks.push({ text: '', pageBreak: 'after' });
+      }
+    } else if (isLastMedium && groupCounter < totalGroups) {
+      groupBlocks.push({
+        text: '-- End of Report --',
+        style: 'bodyValue',
+        alignment: 'center',
+        bold: true,
+        margin: [0, 20, 0, 4]
+      });
+      groupBlocks.push({ text: '', pageBreak: 'after' });
+    }
+  }
+
+  // 🔹 Add remaining small groups
+  for (let i = smallIndex; i < smallGroups.length; i++) {
+    groupBlocks.push(buildGroupBlock(smallGroups[i]));
+    groupCounter++;
+    if ((i - smallIndex + 1) % 3 === 0) {
+      if (groupCounter < totalGroups) {
+        groupBlocks.push({
+          text: '-- End of Report --',
+          style: 'bodyValue',
+          alignment: 'center',
+          bold: true,
+          margin: [0, 20, 0, 4]
+        });
+        groupBlocks.push({ text: '', pageBreak: 'after' });
+      }
+    }
+  }
 
   if (groupBlocks.length > 0) {
     groupBlocks.push({
@@ -331,7 +407,7 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
     pageMargins: [20, 150, 20, 105], // top margin increased to accommodate header
     content: groupBlocks,
     styles,
-    defaultStyle: { font: 'PathLabFont', fontSize: 10 },
+    defaultStyle: { font: 'PathLabFont', fontSize: 11 },
     header: () => ({
       margin: [20, 20, 20, 0],
       stack: labHeader(patient, labDetails)
@@ -346,7 +422,7 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
  */
 export function exportSummaryReport(opts) {
   const docDef = getSummaryReportDocDef(opts);
-  pdfMake.createPdf(docDef).download(`Summary_Report_${opts.patient.name || 'Patient'}.pdf`);
+  pdfMake.createPdf(docDef).download(`Report_${opts.patient.name || 'Patient'}.pdf`);
 }
 
 /**

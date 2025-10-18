@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react';
 import {
   Alert, AlertIcon, AlertTitle, AlertDescription, Box, Button, HStack, VStack, Badge, Progress, Text, Divider, Icon,
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter,useToast
+  FormControl, FormLabel, Input, useToast
 } from '@chakra-ui/react';
 import { CheckCircleIcon, InfoIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
 import { getLabDetails, getTestGroups } from '@/services/dbService';
-import { restoreFromFile} from '@/services/backup';
+import { restoreFromFile } from '@/services/backup';
 
 export default function FirstTimeSetupGuard({ children }) {
   const toast = useToast();
   const [labDone, setLabDone] = useState(false);
   const [testDone, setTestDone] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showRestorePrompt, setShowRestorePrompt] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,11 +22,6 @@ export default function FirstTimeSetupGuard({ children }) {
       setLabDone(!!lab);
       setTestDone(tests.length > 0);
       setLoading(false);
-
-      // If not set up, schedule restore prompt
-      if (!lab || tests.length === 0) {
-        setTimeout(() => setShowRestorePrompt(true), 1500);
-      }
     }
     checkSetup();
   }, []);
@@ -35,15 +29,19 @@ export default function FirstTimeSetupGuard({ children }) {
   const stepsCompleted = [labDone, testDone].filter(Boolean).length;
   const setupNeeded = stepsCompleted < 2;
 
-  const handleRestore = async () => {
-    setShowRestorePrompt(false);
+  const handleRestoreFile = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
     try {
-      const [fileHandle] = await window.showOpenFilePicker({
-        types: [{ description: 'Backup Files', accept: { 'application/json': ['.json', '.txt'] } }]
+      await restoreFromFile(file, 'merge');
+      toast({
+        title: 'Restore Complete',
+        description: `${file.name} has been imported.`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true
       });
-      const file = await fileHandle.getFile();
-      await restoreFromFile(file, 'merge'); // or 'replace'
-      alert(`✅ Restore Completed. ${file.name} has been imported.`);
       window.location.href = '/pathology-lab/';
     } catch (err) {
       console.error(err);
@@ -52,12 +50,11 @@ export default function FirstTimeSetupGuard({ children }) {
         description: err.message || 'Error during restore.',
         status: 'error',
         duration: 3000,
-        isClosable: true,
+        isClosable: true
       });
     }
   };
 
-  // Helper to render the setup screen
   function renderSetupUI() {
     return (
       <Box p="6" maxW="900px" mx="auto">
@@ -80,7 +77,6 @@ export default function FirstTimeSetupGuard({ children }) {
             so everything is ready for smooth, error-proof operations.
           </AlertDescription>
 
-          {/* Progress */}
           <Progress
             value={(stepsCompleted / 2) * 100}
             size="sm"
@@ -90,7 +86,6 @@ export default function FirstTimeSetupGuard({ children }) {
             mb="4"
           />
 
-          {/* Actions */}
           <VStack spacing={4} w="100%">
             <HStack spacing={4} justify="center" w="100%">
               <Button
@@ -117,6 +112,25 @@ export default function FirstTimeSetupGuard({ children }) {
               </Button>
               {testDone && <Badge colorScheme="green">Completed</Badge>}
             </HStack>
+
+            {stepsCompleted <= 0 && (
+              <>
+                <Divider my={6} />
+                <FormControl w="100%" maxW="400px">
+                  <FormLabel htmlFor="restoreFile" fontWeight="bold" textAlign="left">
+                    Or restore from backup:
+                  </FormLabel>
+                  <Input
+                    id="restoreFile"
+                    type="file"
+                    accept=".json,.txt"
+                    onChange={handleRestoreFile}
+                    variant="filled"
+                    size="md"
+                  />
+                </FormControl>
+              </>
+            )}
           </VStack>
 
           <Divider my={6} />
@@ -129,42 +143,11 @@ export default function FirstTimeSetupGuard({ children }) {
     );
   }
 
-  // Helper for restore modal
-  function renderRestoreModal() {
-    return (
-      <Modal isOpen={showRestorePrompt} onClose={() => setShowRestorePrompt(false)} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Restore backup?</ModalHeader>
-          <ModalBody>
-            <Text>
-              We detected this is your first time here. Do you want to restore a backup from your drive?
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleRestore}>
-              Yes, Restore
-            </Button>
-            <Button variant="ghost" onClick={() => setShowRestorePrompt(false)}>
-              No, Set Up Manually
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    );
-  }
-
   if (loading) return null;
 
   if (setupNeeded) {
-    return (
-      <>
-        {renderSetupUI()}
-        {stepsCompleted <= 0 && renderRestoreModal()}
-      </>
-    );
+    return <>{renderSetupUI()}</>;
   }
 
   return <>{children}</>;
-
 }

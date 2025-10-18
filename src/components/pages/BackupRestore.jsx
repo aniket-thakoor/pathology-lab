@@ -1,9 +1,20 @@
-import { Box, Heading, VStack, Button, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Heading,
+  VStack,
+  Button,
+  useToast,
+  FormControl,
+  FormLabel,
+  Input
+} from '@chakra-ui/react';
 import { backupNow, restoreFromFile, shareLatestNow } from '@/services/backup';
 import PageHeader from '../common/PageHeader';
+import { useRef } from 'react';
 
 export default function BackupRestore() {
   const toast = useToast();
+  const fileInputRef = useRef(null);
 
   const handleBackup = async () => {
     try {
@@ -13,7 +24,7 @@ export default function BackupRestore() {
         description: `File: ${filename}`,
         status: 'success',
         duration: 3000,
-        isClosable: true,
+        isClosable: true
       });
     } catch (err) {
       console.error(err);
@@ -22,24 +33,23 @@ export default function BackupRestore() {
         description: err.message || 'An error occurred while creating the backup.',
         status: 'error',
         duration: 3000,
-        isClosable: true,
+        isClosable: true
       });
     }
   };
 
-  const handleRestore = async () => {
+  const handleRestoreFile = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
     try {
-      const [fileHandle] = await window.showOpenFilePicker({
-        types: [{ description: 'Backup Files', accept: { 'application/json': ['.json', '.txt'] } }]
-      });
-      const file = await fileHandle.getFile();
       await restoreFromFile(file, 'merge'); // or 'replace'
       toast({
         title: 'Restore Complete',
         description: `${file.name} has been imported.`,
         status: 'success',
         duration: 3000,
-        isClosable: true,
+        isClosable: true
       });
     } catch (err) {
       console.error(err);
@@ -48,7 +58,7 @@ export default function BackupRestore() {
         description: err.message || 'Error during restore.',
         status: 'error',
         duration: 3000,
-        isClosable: true,
+        isClosable: true
       });
     }
   };
@@ -69,9 +79,20 @@ export default function BackupRestore() {
         <Button colorScheme="blue" w="100%" size="lg" onClick={handleBackup}>
           💾 Backup
         </Button>
-        <Button colorScheme="green" w="100%" size="lg" onClick={handleRestore}>
-          🔄 Restore
-        </Button>
+
+        <FormControl>
+          <FormLabel htmlFor="restoreFile">🔄 Restore</FormLabel>
+          <Input
+            id="restoreFile"
+            type="file"
+            accept=".json,.txt"
+            onChange={handleRestoreFile}
+            ref={fileInputRef}
+            variant="filled"
+            size="lg"
+          />
+        </FormControl>
+
         <Button colorScheme="teal" w="100%" size="lg" onClick={handleShare}>
           📤 Share
         </Button>
