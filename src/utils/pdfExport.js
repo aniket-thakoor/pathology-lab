@@ -19,14 +19,14 @@ pdfMake.fonts = {
  * Common styles
  */
 const styles = {
-  labTitle: { fontSize: 21, bold: true, color: '#333', margin: [0, 0, 0, 4] },
-  labSub: { fontSize: 11, italics: true, color: '#555', margin: [0, 0, 0, 6] },
-  sectionTitle: { fontSize: 15, bold: true, margin: [0, 22, 0, 4], color: '#222' },
+  labTitle: { fontSize: 21, bold: true, color: '#D00', margin: [0, 0, 0, 4] },
+  labSub: { fontSize: 11, italics: true, color: '#800', margin: [0, 0, 0, 6] },
+  sectionTitle: { fontSize: 15, bold: true, margin: [0, 22, 0, 4], color: '#000' },
   bodyLabel: { fontSize: 9, bold: true },
-  bodyValue: { fontSize: 11, color: '#222' },
-  abnormalValue: { fontSize: 11, bold: true, color: '#222' },
+  bodyValue: { fontSize: 11, color: '#000' },
+  abnormalValue: { fontSize: 11, bold: true, color: '#000' },
   noteText: { fontSize: 8, italics: true, color: '#555' },
-  tableHeader: { fontSize: 12, bold: true, color: '#222' }
+  tableHeader: { fontSize: 12, bold: true, color: '#000' }
 };
 
 /**
@@ -57,8 +57,8 @@ const boxedSection = (leftStack, rightStack) => ({
   layout: {
     hLineWidth: () => 0.5,
     vLineWidth: () => 0.5,
-    hLineColor: () => '#222',
-    vLineColor: () => '#222'
+    hLineColor: () => '#000',
+    vLineColor: () => '#000'
   },
   margin: [0, 5, 0, 10]
 });
@@ -89,7 +89,7 @@ const labHeader = (patient, labDetails) => ([
       ].filter(Boolean),
       [
         { text: labDetails.specialistName || '', bold: true, alignment: 'right', style: 'bodyValue' },
-        { text: labDetails.specialistQualification || '', alignment: 'right', color: '#222', style: 'bodyValue' }
+        { text: labDetails.specialistQualification || '', alignment: 'right', color: '#000', style: 'bodyValue' }
       ]
     ]
   },
@@ -144,7 +144,7 @@ const footer = (labDetails, currentPage, pageCount) => {
                     ? { text: 'Please Correlate Clinically.', style: 'bodyValue', margin: [0, 6, 0, 0] }
                     : { text: '', margin: [0, 20, 0, 0] },
                   { text: '', margin: [0, 20, 0, 20] },
-                  { text: 'Technologist', bold: true, color: '#222' }
+                  { text: 'Technologist', bold: true, color: '#000' }
                 ].filter(Boolean),
                 border: [false, false, false, false],
                 alignment: 'left'
@@ -154,7 +154,7 @@ const footer = (labDetails, currentPage, pageCount) => {
                   labDetails.signature
                     ? { image: labDetails.signature, width: 60, alignment: 'right', margin: [0, 0, 0, 4] }
                     : { text: '' },
-                  { text: labDetails.doctorName || '', bold: true, alignment: 'right', color: '#222' },
+                  { text: labDetails.doctorName || '', bold: true, alignment: 'right', color: '#000' },
                   { text: labDetails.doctorQualification || '', alignment: 'right', fontSize: 8 }
                 ],
                 border: [false, false, false, false],
