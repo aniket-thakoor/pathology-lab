@@ -44,7 +44,7 @@ const boxedSection = (leftStack, rightStack) => ({
     body: [[
       {
         table: {
-          widths: ['50%', '50%'],
+          widths: ['55%', '45%'],
           body: [[
             { stack: leftStack.filter(Boolean), border: [false, false, false, false] },
             { stack: rightStack.filter(Boolean), border: [false, false, false, false] }
