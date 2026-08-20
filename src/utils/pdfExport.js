@@ -249,8 +249,8 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
 
     const headers = [
       { text: 'TEST DESCRIPTION', style: 'tableHeader', decoration: 'underline' },
-      { text: 'OBSERVED VALUE', style: 'tableHeader', alignment: 'center', decoration: 'underline' },
-      ...(group.hasRanges ? [{ text: 'REFERENCE RANGE', style: 'tableHeader', alignment: 'right', decoration: 'underline' }] : [])
+      { text: 'OBSERVED VALUE', style: 'tableHeader', alignment: 'left', decoration: 'underline' },
+      ...(group.hasRanges ? [{ text: 'REFERENCE RANGE', style: 'tableHeader', alignment: 'left', decoration: 'underline' }] : [])
     ];
 
     const rows = [];
@@ -268,12 +268,12 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
 
         const row = [
           { text: param.name, style: 'bodyValue' },
-          { text: val, style: abnormal ? 'abnormalValue' : 'bodyValue', alignment: group.hasRanges ? 'center' : 'left', decoration: abnormal ? 'underline' : '' }
+          { text: val, margin: group.hasRanges ? [-60, 0, 0, 0] : [0, 0, 0, 0], style: abnormal ? 'abnormalValue' : 'bodyValue', alignment: group.hasRanges ? 'center' : 'left', decoration: abnormal ? 'underline' : '' }
         ];
         if (group.hasRanges) {
           row.push({
             text: showRanges ? `${rangeText}${param.unit ? ' (' + param.unit + ')' : ''}` : '',
-            alignment: 'right',
+            alignment: 'left',
             style: 'bodyValue',
             noWrap: true
           });
@@ -291,7 +291,7 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
       }
     });
 
-    groupContent.push(buildTable(headers, rows, group.hasRanges ? ['33.34%', '33.33%', '33.33%'] : ['*', 'auto']));
+    groupContent.push(buildTable(headers, rows, group.hasRanges ? ['40%', '30%', '30%'] : ['*', 'auto']));
 
     if (group.desc) {
       groupContent.push({
