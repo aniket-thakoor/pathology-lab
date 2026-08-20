@@ -404,7 +404,7 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
 
   return {
     pageSize: 'A4',
-    pageMargins: [20, 150, 20, 105], // top margin increased to accommodate header
+    pageMargins: [20, 163, 20, 105], // top margin increased to accommodate header
     content: groupBlocks,
     styles,
     defaultStyle: { font: 'PathLabFont', fontSize: 11 },
