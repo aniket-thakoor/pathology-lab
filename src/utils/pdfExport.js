@@ -94,34 +94,77 @@ const labHeader = (patient, labDetails) => ([
     ]
   },
   boxedSection(
-    [
-      // Add prefix here based on gender
-      labelVal(
-        `Patient's Name: `,
-        `${patient.gender?.toLowerCase() === 'male'
-          ? 'Mr. '
-          : patient.gender?.toLowerCase() === 'female'
-            ? 'Ms. '
-            : ''}${patient.name || ''}`
-      ),
+  [
+    // Patient name with gender-based prefix
+    {
+      columns: [
+        {
+          width: 100,
+          text: "Patient's Name: ",
+          bold: true,
+          style: 'bodyValue'
+        },
+        {
+          width: '*',
+          text: `${patient.gender?.toLowerCase() === 'male'
+            ? 'Mr. '
+            : patient.gender?.toLowerCase() === 'female'
+              ? 'Ms. '
+              : ''
+          }${patient.name || ''}`,
+          style: 'bodyValue'
+        }
+      ],
+      columnGap: 2
+    },
+
+    // Age and gender
+    {
+      columns: [
+        { width: 'auto', ...labelVal('Age: ', patient.age) },
+        { width: 'auto', ...labelVal('Gender: ', patient.gender, {alignment: 'right'}) }
+      ],
+      columnGap: 15
+    },
+
+    // Mobile number
+    patient.mobile && labelVal('Mobile: ', patient.mobile)
+  ],
+
+  [
+    // Referring doctor's name with aligned wrapping
+    {
+      columns: [
+        {
+          width: 80,
+          text: 'Referred By: ',
+          bold: true,
+          style: 'bodyValue'
+        },
+        {
+          width: '*',
+          text: patient.referredBy || '',
+          style: 'bodyValue'
+        }
+      ],
+      columnGap: 2
+    },
+
+    // Sample collection date
+    labelVal(
+      'Sample Collected On: ',
+      patient.sampleDate
+        ? new Date(patient.sampleDate).toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          })
+        : '',
       {
-        columns: [
-          { width: 'auto', ...labelVal('Age: ', patient.age) },
-          { width: 'auto', ...labelVal('Gender: ', patient.gender, { alignment: 'right' }) }
-        ],
-        columnGap: 15
-      },
-      patient.mobile && labelVal('Mobile: ', patient.mobile)
-    ],
-    [
-      labelVal('Referred By: ', patient.referredBy, { alignment: 'right' }),
-      labelVal('Sample Collected On: ', new Date(patient.sampleDate).toLocaleDateString('en-IN', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: 'numeric' 
-      }), { alignment: 'right' })
-    ]
-  )
+        alignment: 'left'
+      }
+    )
+  ])
 ]);
 
 /**
