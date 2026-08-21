@@ -27,8 +27,12 @@ const LabDetails = () => {
   });
   const navigate = useNavigate();
   const [showAppDetails, setShowAppDetails] = useState(() => {
-  return localStorage.getItem('showAppDetailsInReport') === 'true';
-});
+    return localStorage.getItem('showAppDetailsInReport') === 'true';
+  });
+
+  const [showPageNumbers, setShowPageNumbers] = useState(() => {
+    return localStorage.getItem('showPageNumbersInReport') === 'true';
+  });
 
   useEffect(() => {
     getLabDetails().then((stored) => {
@@ -54,6 +58,7 @@ const LabDetails = () => {
 
     await putLabDetails(details);
     localStorage.setItem('showAppDetailsInReport', String(showAppDetails));
+    localStorage.setItem('showPageNumbersInReport', String(showPageNumbers));
     alert('✅ Lab details saved!');
     navigate('/');
   };
@@ -131,6 +136,18 @@ const LabDetails = () => {
             id="showAppDetails"
             isChecked={showAppDetails}
             onChange={(e) => setShowAppDetails(e.target.checked)}
+            colorScheme="blue"
+          />
+        </FormControl>
+
+        <FormControl display="flex" alignItems="center">
+          <FormLabel htmlFor="showPageNumbers" mb="0">
+            Show Page Numbers in the Report?
+          </FormLabel>
+          <Switch
+            id="showPageNumbers"
+            isChecked={showPageNumbers}
+            onChange={(e) => setShowPageNumbers(e.target.checked)}
             colorScheme="blue"
           />
         </FormControl>

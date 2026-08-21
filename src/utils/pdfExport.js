@@ -19,8 +19,8 @@ pdfMake.fonts = {
  * Common styles
  */
 const styles = {
-  labTitle: { fontSize: 21, bold: true, color: '#D00', margin: [0, 0, 0, 4] },
-  labSub: { fontSize: 11, italics: true, color: '#800', margin: [0, 0, 0, 6] },
+  labTitle: { fontSize: 22, italics: true, bold: true, color: '#FF3333', margin: [0, 0, 0, 4] },
+  labSub: { fontSize: 11, italics: true, color: '#A00', margin: [0, 0, 0, 6] },
   sectionTitle: { fontSize: 15, bold: true, margin: [0, 22, 0, 4], color: '#000' },
   bodyLabel: { fontSize: 9, bold: true },
   bodyValue: { fontSize: 11, color: '#000' },
@@ -172,6 +172,7 @@ const labHeader = (patient, labDetails) => ([
  */
 const footer = (labDetails, currentPage, pageCount) => {
   const showAppDetails = localStorage.getItem('showAppDetailsInReport') === 'true';
+  const showPageNumbers = localStorage.getItem('showPageNumbersInReport') === 'true';
 
   return {
     margin: [40, 0, 40, 40],
@@ -208,13 +209,17 @@ const footer = (labDetails, currentPage, pageCount) => {
         },
         layout: 'noBorders'
       },
-      {
-        text: `Page ${currentPage} of ${pageCount}`,
-        alignment: 'right',
-        fontSize: 8,
-        color: '#555',
-        margin: [0, 6, 0, 0]
-      },
+      ...(showPageNumbers
+        ? [
+            {
+              text: `Page ${currentPage} of ${pageCount}`,
+              alignment: 'right',
+              fontSize: 8,
+              color: '#555',
+              margin: [0, 6, 0, 0]
+            }
+          ]
+        : []),
       ...(showAppDetails && currentPage === pageCount
         ? [{
             text: [
@@ -447,7 +452,7 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
 
   return {
     pageSize: 'A4',
-    pageMargins: [20, 163, 20, 105], // top margin increased to accommodate header
+    pageMargins: [20, 164, 20, 105], // top margin increased to accommodate header
     content: groupBlocks,
     styles,
     defaultStyle: { font: 'PathLabFont', fontSize: 11 },
