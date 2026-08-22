@@ -20,7 +20,7 @@ pdfMake.fonts = {
  */
 const styles = {
   labTitle: { fontSize: 22, italics: true, bold: true, color: '#FF3333', margin: [0, 0, 0, 4] },
-  labSub: { fontSize: 11, italics: true, color: '#A00', margin: [0, 0, 0, 6] },
+  labSub: { fontSize: 12, italics: true, color: '#A00', margin: [0, 0, 0, 6] },
   sectionTitle: { fontSize: 15, bold: true, margin: [0, 22, 0, 4], color: '#000' },
   bodyLabel: { fontSize: 9, bold: true },
   bodyValue: { fontSize: 11, color: '#000' },
@@ -452,7 +452,7 @@ export function getSummaryReportDocDef({ patient, labDetails, groups, results, s
 
   return {
     pageSize: 'A4',
-    pageMargins: [20, 164, 20, 105], // top margin increased to accommodate header
+    pageMargins: [20, 164.4, 20, 105], // top margin increased to accommodate header
     content: groupBlocks,
     styles,
     defaultStyle: { font: 'PathLabFont', fontSize: 11 },
