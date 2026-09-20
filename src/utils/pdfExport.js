@@ -19,8 +19,8 @@ pdfMake.fonts = {
  * Common styles
  */
 const styles = {
-  labTitle: { fontSize: 22, italics: true, bold: true, color: '#FF3333', margin: [0, 0, 0, 4] },
-  labSub: { fontSize: 12, italics: true, color: '#A00', margin: [0, 0, 0, 6] },
+  labTitle: { fontSize: 22, italics: true, bold: true, color: '#D00', margin: [0, 0, 0, 4] },
+  labSub: { fontSize: 12, italics: true, color: '#800', margin: [0, 0, 0, 6] },
   sectionTitle: { fontSize: 15, bold: true, margin: [0, 22, 0, 4], color: '#000' },
   bodyLabel: { fontSize: 9, bold: true },
   bodyValue: { fontSize: 11, color: '#000' },
